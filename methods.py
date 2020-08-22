@@ -431,6 +431,7 @@ def no_verbose(sys, env):
         colors["end"],
     )
 
+    
     env.Append(CXXCOMSTR=[compile_source_message])
     env.Append(CCCOMSTR=[compile_source_message])
     env.Append(SHCCCOMSTR=[compile_shared_source_message])
