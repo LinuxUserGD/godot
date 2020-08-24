@@ -970,14 +970,27 @@ void AudioServer::init_channels_and_buffers() {
 	}
 }
 
-void AudioServer::init() {
+#ifdef WII
+#include <wiiuse/wpad.h>
+#include <gccore.h>
+#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
+#else
+#define _break(...)
+#endif
 
+void AudioServer::init() {
+	_break("AudioServer::init entered!\n");
 	channel_disable_threshold_db = GLOBAL_DEF_RST("audio/channel_disable_threshold_db", -60.0);
+	_break("audio/channel_disable_threshold_db set!\n");
 	channel_disable_frames = float(GLOBAL_DEF_RST("audio/channel_disable_time", 2.0)) * get_mix_rate();
+	_break("audio/channel_disable_time set!\n");
 	ProjectSettings::get_singleton()->set_custom_property_info("audio/channel_disable_time", PropertyInfo(Variant::REAL, "audio/channel_disable_time", PROPERTY_HINT_RANGE, "0,5,0.01,or_greater"));
+	_break("audio/channel_disable_time set!");
 	buffer_size = 1024; //hardcoded for now
+	_break("Audio settings set!\n");
 
 	init_channels_and_buffers();
+	_break("Audio channels and buffers initialized!\n");
 
 	mix_count = 0;
 	set_bus_count(1);
@@ -985,6 +998,7 @@ void AudioServer::init() {
 
 	if (AudioDriver::get_singleton())
 		AudioDriver::get_singleton()->start();
+	_break("Audio driver started!\n");
 
 #ifdef TOOLS_ENABLED
 	set_edited(false); //avoid editors from thinking this was edited

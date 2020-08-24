@@ -8,12 +8,16 @@
 #include <gccore.h>
 #include <ogc/lwp_watchdog.h> // ticks_to_microseconds
 #include <fat.h>
+#include <network.h>
+#include <wiiuse/wpad.h>
 
 #include "core/os/thread_dummy.h"
 #include "core/os/file_access.h"
 
 #include "file_access_wii.h"
 #include "dir_access_wii.h"
+#include "ip_wii.h"
+#include "audio_driver_wii.h"
 
 static uint64_t _clock_start = 0;
 static void _setup_clock() {
@@ -41,6 +45,12 @@ void OS_Wii::initialize_core() {
 	DirAccess::make_default<DirAccessWii>(DirAccess::ACCESS_USERDATA);
 	DirAccess::make_default<DirAccessWii>(DirAccess::ACCESS_FILESYSTEM);
 
+	if(net_init() < 0)
+	{
+		ERR_PRINT("net_init() failed! Networking may not function!");
+	}
+	IP_Wii::make_default();
+
     _setup_clock();
 }
 
@@ -59,7 +69,7 @@ Error OS_Wii::initialize(const VideoMode &p_desired, int p_video_driver, int p_a
 	//	visual_server = memnew(VisualServerWrapMT(visual_server, false));
 	//}
 
-    // TODO: AudioDriverManager::initialize(p_audio_driver);
+    AudioDriverManager::initialize(p_audio_driver);
 
     input = memnew(InputDefault);
 
@@ -92,7 +102,7 @@ void OS_Wii::finalize() {
 }
 
 void OS_Wii::finalize_core() {
-
+	net_deinit();
 }
 
 bool OS_Wii::_check_internal_feature_support(const String &p_feature)
@@ -100,14 +110,19 @@ bool OS_Wii::_check_internal_feature_support(const String &p_feature)
     return false;
 }
 
+#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
+
 void OS_Wii::run()
 {
+	_break("running!\n");
     force_quit = false;
 
     if(!main_loop)
         return;
     
     main_loop->init();
+
+	_break("main loop init!\n");
 
     while(!force_quit) {
         // TODO: Process input events
@@ -219,4 +234,14 @@ uint64_t OS_Wii::get_ticks_usec() const
 bool OS_Wii::can_draw() const
 {
     return true;
+}
+
+OS_Wii::OS_Wii()
+{
+	AudioDriverManager::add_driver(&wii_audio_driver);
+}
+
+OS_Wii::~OS_Wii()
+{
+	
 }

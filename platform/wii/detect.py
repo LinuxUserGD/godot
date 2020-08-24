@@ -14,14 +14,75 @@ def can_build():
 def get_flags():
     return [
         ("tools", False),
+        ("module_arkit_enabled", False),
+        ("module_assimp_enabled", False),
         ("module_bullet_enabled", False),
-        ("module_mbedtls_enabled", False),
+        ("module_camera_enabled", False),
+        ("module_csg_enabled", False),
+        ("module_cvtt_enabled", False),
+        ("module_dds_enabled", False),
+        ("module_enet_enabled", False),
+        ("module_etc_enabled", False),
+        #("module_freetype_enabled", False),
         ("module_gdnative_enabled", False),
+        #("module_gdscript_enabled", False),
+        ("module_gridmap_enabled", False),
+        ("module_hdr_enabled", False),
+        ("module_jpg_enabled", False),
+        ("module_jsonrpc_enabled", False),
+        ("module_mbedtls_enabled", False),
+        ("module_mobile_vr_enabled", False),
+        ("module_ogg_enabled", False),
+        ("module_opensimplex_enabled", False),
+        ("module_opus_enabled", False),
+        ("module_pvr_enabled", False),
+        ("module_recast_enabled", False),
         ("module_regex_enabled", False),
+        ("module_squish_enabled", False),
+        ("module_stb_vorbis_enabled", False),
+        ("module_svg_enabled", False),
+        ("module_tga_enabled", False),
+        ("module_theora_enabled", False),
+        ("module_tinyexr_enabled", False),
         ("module_upnp_enabled", False),
+        ("module_vhacd_enabled", False),
+        ("module_visual_script_enabled", False),
+        ("module_vorbis_enabled", False),
         ("module_webm_enabled", False),
+        ("module_webp_enabled", False),
+        ("module_webrtc_enabled", False),
         ("module_websocket_enabled", False),
-        ("module_enet_enabled", False)
+        ("module_xatlas_unwrap_enabled", False),
+
+        ("builtin_bullet", False),
+        ("builtin_certs", False),
+        ("builtin_enet", False),
+        #("builtin_freetype", False),
+        ("builtin_libogg", False),
+        #("builtin_libpng", False),
+        ("builtin_libtheora", False),
+        ("builtin_libvorbis", False),
+        ("builtin_libvpx", False),
+        ("builtin_libwebp", False),
+        ("builtin_wslay", False),
+        ("builtin_mbedtls", False),
+        ("builtin_miniupnpc", False),
+        ("builtin_opus", False),
+        ("builtin_pcre2", False),
+        ("builtin_pcre2_with_jit", False),
+        ("builtin_recast", False),
+        ("builtin_squish", False),
+        ("builtin_xatlas", False),
+        #("builtin_zlib", False),
+        #("builtin_zstd", False),
+
+        ("disable_3d", True),
+        ("disable_advanced_gui", True),
+        ("deprecated", False),
+        ("optimize", "size"),
+
+        #("gdscript", False),
+        ("minizip", False)
     ]
 
 def get_opts():
@@ -105,17 +166,34 @@ def configure(env):
         dkp_path + "/libogc/lib/wii"
     ],
     CCFLAGS=[
-        "-mrvl", "-mcpu=750", "-meabi", "-mhard-float", "-O0"
+        "-mrvl", "-mcpu=750", "-meabi", "-mhard-float", "-ffunction-sections", "-fdata-sections", "-fno-rtti", "-fno-exceptions"
     ],
     LINKFLAGS=[
-        "-mrvl", "-mcpu=750", "-meabi", "-mhard-float"
+        "-mrvl", "-mcpu=750", "-meabi", "-mhard-float", "-T", "platform/wii/pck_embed.ld", "-Wl,--gc-sections"
     ],
     CPPDEFINES=[
-        "GEKKO", "WII", "NO_THREADS"
+        "GEKKO", "WII", "NO_THREADS", "NO_SAFE_CAST"
     ],
     LIBS=[
         "wiiuse", "bte", "fat", "ogc", "m"
     ])
+
+    if env["optimize"] == "size":
+        env.Append(CCFLAGS=["-Os"])
+    elif env["target"] == "debug":
+        env.Append(CCFLAGS=["-Og"])
+    else:
+        env.Append(CCFLAGS=["-O3"])
+
+    if env["use_lto"]:
+        env.Append(CCFLAGS=["-flto"])
+        env.Append(LINKFLAGS=["-flto=" + str(env.GetOption("num_jobs"))])
+        env["AR"] = tools_path + tool_prefix + "gcc-ar"
+        env["RANLIB"] = tools_path + tool_prefix + "gcc-ranlib"
+    if env["target"] == "debug":
+        env.Append(CPPDEFINES=["DEBUG_ENABLED"])
+        env.Append(CCFLAGS=["-g"])
+        env.Prepend(LIBS=["db"])
 
     env.Prepend(CPPPATH=["#platform/wii"])
     #TODO: Debug flags

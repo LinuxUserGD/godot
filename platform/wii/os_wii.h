@@ -5,6 +5,7 @@
 #include "servers/visual/visual_server_raster.h"
 #include "servers/visual/visual_server_wrap_mt.h"
 #include "main/input_default.h"
+#include "audio_driver_wii.h"
 
 #include "gx/texture_loader_gx.h"
 
@@ -16,6 +17,7 @@ class OS_Wii : public OS {
     VisualServer *visual_server;
     InputDefault *input;
     VideoMode video_mode;
+    AudioDriverWii wii_audio_driver;
 
     bool force_quit;
 
@@ -80,6 +82,9 @@ public:
     // TODO: Virtual keyboard?
 
     void run();
+
+    OS_Wii();
+    ~OS_Wii();
 };
 
 #endif

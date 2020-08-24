@@ -341,6 +341,14 @@ void Main::print_help(const char *p_binary) {
  *   in help, it's a bit messy and should be globalized with the setup() parsing somehow.
  */
 
+#ifdef WII
+#include <wiiuse/wpad.h>
+#include <gccore.h>
+#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
+#else
+#define _break(...)
+#endif
+
 Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_phase) {
 	RID_OwnerBase::init_rid();
 
@@ -851,6 +859,8 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		I = N;
 	}
 
+	OS::get_singleton()->set_cmdline(execpath, main_args);
+
 #ifdef TOOLS_ENABLED
 	if (editor && project_manager) {
 		OS::get_singleton()->print("Error: Command line arguments implied opening both editor and project manager, which is not possible. Aborting.\n");
@@ -1007,8 +1017,6 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 
 	if (quiet_stdout)
 		_print_line_enabled = false;
-
-	OS::get_singleton()->set_cmdline(execpath, main_args);
 
 	GLOBAL_DEF("rendering/quality/driver/driver_name", "GLES3");
 	ProjectSettings::get_singleton()->set_custom_property_info("rendering/quality/driver/driver_name", PropertyInfo(Variant::STRING, "rendering/quality/driver/driver_name", PROPERTY_HINT_ENUM, "GLES2,GLES3"));
@@ -1240,6 +1248,8 @@ error:
 	OS::get_singleton()->finalize_core();
 	locale = String();
 
+	_break("Jumped to error.\n");
+
 	return ERR_INVALID_PARAMETER;
 }
 
@@ -1252,10 +1262,14 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 		Thread::_main_thread_id = p_main_tid_override;
 	}
 
+	_break("Began phase 2!\n");
+
 	Error err = OS::get_singleton()->initialize(video_mode, video_driver_idx, audio_driver_idx);
 	if (err != OK) {
 		return err;
 	}
+
+	_break("Initialized OS singleton!\n");
 
 	print_line(" "); //add a blank line for readability
 
@@ -1266,15 +1280,21 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 	// right moment to create and initialize the audio server
 
 	audio_server = memnew(AudioServer);
+	_break("Allocated audio server!\n");
 	audio_server->init();
+	_break("Initialized audio server!\n");
 
 	// also init our arvr_server from here
 	arvr_server = memnew(ARVRServer);
+
+	_break("ARVR server initialized!\n");
 
 	// and finally setup this property under visual_server
 	VisualServer::get_singleton()->set_render_loop_enabled(!disable_render_loop);
 
 	register_core_singletons();
+
+	_break("Registered core singletons!\n");
 
 	MAIN_PRINT("Main: Setup Logo");
 
@@ -1303,6 +1323,8 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 	}
 
 	register_server_types();
+
+	_break("Registered server types!");
 
 	MAIN_PRINT("Main: Load Remaps");
 
@@ -1338,6 +1360,7 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 			Ref<Image> splash = (editor || project_manager) ? memnew(Image(boot_splash_editor_png)) : memnew(Image(boot_splash_png));
 #else
 			Ref<Image> splash = memnew(Image(boot_splash_png));
+			_break("Loaded boot logo!");
 #endif
 
 			MAIN_PRINT("Main: ClearColor");
@@ -1454,6 +1477,7 @@ static MainTimerSync main_timer_sync;
 
 bool Main::start() {
 
+	_break("Begun Main::start()!\n");
 	ERR_FAIL_COND_V(!_start_success, false);
 
 	bool hasicon = false;

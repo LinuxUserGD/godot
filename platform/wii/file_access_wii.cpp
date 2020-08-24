@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-FileAccessWii::FileAccessWii() : fp(NULL), flags(0), last_error(OK)
+FileAccessWii::FileAccessWii() : fp(NULL), last_error(OK), flags(0)
 {
 }
 

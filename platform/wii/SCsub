@@ -7,7 +7,9 @@ SConscript("gx/SCsub")
 os_wii = [
     "os_wii.cpp",
     "file_access_wii.cpp",
-    "dir_access_wii.cpp"
+    "dir_access_wii.cpp",
+    "ip_wii.cpp",
+    "audio_driver_wii.cpp"
 ]
 
 prog = env.add_program("#bin/godot", ["godot_wii.cpp"] + os_wii, PROGSUFFIX=env["PROGSUFFIX"] + ".elf")
