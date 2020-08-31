@@ -37,7 +37,7 @@ def get_flags():
         ("module_opus_enabled", False),
         ("module_pvr_enabled", False),
         ("module_recast_enabled", False),
-        ("module_regex_enabled", False),
+        #("module_regex_enabled", False),
         ("module_squish_enabled", False),
         ("module_stb_vorbis_enabled", False),
         ("module_svg_enabled", False),
@@ -68,7 +68,7 @@ def get_flags():
         ("builtin_mbedtls", False),
         ("builtin_miniupnpc", False),
         ("builtin_opus", False),
-        ("builtin_pcre2", False),
+        #("builtin_pcre2", False),
         ("builtin_pcre2_with_jit", False),
         ("builtin_recast", False),
         ("builtin_squish", False),
@@ -77,7 +77,7 @@ def get_flags():
         #("builtin_zstd", False),
 
         ("disable_3d", True),
-        ("disable_advanced_gui", True),
+        #("disable_advanced_gui", True),
         ("deprecated", False),
         ("optimize", "size"),
 
@@ -86,8 +86,13 @@ def get_flags():
     ]
 
 def get_opts():
-    from SCons.Variables import PathVariable
-    return [PathVariable("dkp_path", "The path to your DevKitPro installation. Required for building on Windows.", "", PathVariable.PathAccept)]
+    from SCons.Variables import PathVariable, BoolVariable
+    return [
+        PathVariable("dkp_path", "The path to your DevKitPro installation. Required for building on Windows.", "", PathVariable.PathAccept),
+        BoolVariable("use_portlib_freetype", "If true, uses devkitpro's portlib of FreeType instead of the built-in.", True),
+        BoolVariable("use_portlib_libpng", "If true, uses devkitpro's portlib of libpng instead of the built-in.", True),
+        BoolVariable("use_portlib_zlib", "If true, uses devkitpro's portlib of zlib instead of the built-in.", True)
+    ]
 
 def create(env):
     return env.Clone(tools=["mingw"])
@@ -144,6 +149,7 @@ def configure(env):
     if not dkp_path:
         if platform.system() != "Windows":
             dkp_path = os.getenv("DEVKITPRO")
+            env["dkp_path"] = dkp_path
         else:
             print("ERR: Please define 'dkp_path' to point to your DevKitPro folder.")
             exit(1)
@@ -177,6 +183,39 @@ def configure(env):
     LIBS=[
         "wiiuse", "bte", "fat", "ogc", "m"
     ])
+
+    if env["use_portlib_freetype"] or env["use_portlib_libpng"]:
+        env.Append(
+            LIBPATH=[
+                dkp_path + "/portlibs/ppc/lib"
+            ]
+        )
+
+    if env["use_portlib_freetype"] and env["module_freetype_enabled"]:
+        env["builtin_freetype"] = False
+        env.Append(
+            CPPPATH=[
+                dkp_path + "/portlibs/ppc/include/freetype2"
+            ],
+            LIBS=["freetype", "bz2"]
+        )
+    if env["use_portlib_libpng"]:
+        env["builtin_libpng"] = False
+        env.Append(
+            CPPPATH=[
+                dkp_path + "/portlibs/ppc/include/libpng16"
+            ],
+            LIBS=["png"]
+        )
+    
+    if env["use_portlib_zlib"]:
+        env["builtin_zlib"] = False
+        env.Append(
+            CPPPATH=[
+                dkp_path + "/portlibs/ppc/include"
+            ],
+            LIBS=["z"]
+        )
 
     if env["optimize"] == "size":
         env.Append(CCFLAGS=["-Os"])
