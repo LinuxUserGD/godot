@@ -2,14 +2,16 @@
 Import("env")
 Export("env")
 
-SConscript("gx/SCsub")
-
 os_wii = [
     "os_wii.cpp",
     "file_access_wii.cpp",
     "dir_access_wii.cpp",
     "ip_wii.cpp",
-    "audio_driver_wii.cpp"
+    "audio_driver_wii.cpp",
+    #"gx/rasterizer_gx.cpp",
+    "gx/rasterizer_storage_gx.cpp",
+    "gx/rasterizer_canvas_gx.cpp",
+    "gx/rasterizer_scene_gx.cpp"
 ]
 
 bld = Builder(action = env["dkp_path"] + "/tools/bin/elf2dol $SOURCE $TARGET")

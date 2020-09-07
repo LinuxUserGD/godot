@@ -7,13 +7,10 @@
 #include "main/input_default.h"
 #include "audio_driver_wii.h"
 
-#include "gx/texture_loader_gx.h"
-
 class OS_Wii : public OS {
 
     int video_driver_index;
     MainLoop *main_loop;
-    Ref<ResourceFormatGXTexture> texture_loader;
     VisualServer *visual_server;
     InputDefault *input;
     VideoMode video_mode;

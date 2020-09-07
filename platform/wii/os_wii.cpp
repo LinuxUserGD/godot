@@ -59,15 +59,14 @@ Error OS_Wii::initialize(const VideoMode &p_desired, int p_video_driver, int p_a
     
     RasterizerGX::make_current();
 
-    //texture_loader.instance();
-    //ResourceLoader::add_resource_format_loader(texture_loader);
-
     video_driver_index = p_video_driver;
 
     visual_server = memnew(VisualServerRaster);
     //if (get_render_thread_mode() != RENDER_THREAD_UNSAFE) {
 	//	visual_server = memnew(VisualServerWrapMT(visual_server, false));
 	//}
+
+	visual_server->init();
 
     AudioDriverManager::initialize(p_audio_driver);
 
@@ -96,9 +95,6 @@ void OS_Wii::finalize() {
     memdelete(visual_server);
     
     memdelete(input);
-
-    ResourceLoader::remove_resource_format_loader(texture_loader);
-    texture_loader.unref();
 }
 
 void OS_Wii::finalize_core() {
@@ -110,8 +106,8 @@ bool OS_Wii::_check_internal_feature_support(const String &p_feature)
     return false;
 }
 
-#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
-
+//#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
+#define _break(...) printf(__VA_ARGS__)
 void OS_Wii::run()
 {
 	_break("running!\n");

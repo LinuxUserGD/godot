@@ -2,16 +2,55 @@
 #define RASTERIZER_STORAGE_GX_H
 
 #include "servers/visual/rasterizer.h"
+#include "core/image.h"
+
+#include <gccore.h>
+
+class TexCacheRegion : public Reference {
+	GDCLASS(TexCacheRegion, Reference);
+
+	public:
+	enum TexCacheSize {
+		TEXCACHE_32K = GX_TEXCACHE_32K,
+		TEXCACHE_128K = GX_TEXCACHE_128K,
+		TEXCACHE_512K = GX_TEXCACHE_512K,
+		TEXCACHE_NONE = GX_TEXCACHE_NONE,
+	};
+	private:
+
+	bool _is_initialized;
+
+	GXTexRegion region;
+	u32 tmem_even;
+	u32 tmem_odd;
+	TexCacheSize even_size;
+	TexCacheSize odd_size;
+	bool is_mipmap;
+
+	public:
+
+	void initialize(bool is_mipmap, u32 tmem_even, TexCacheSize size_even, u32 tmem_odd, TexCacheSize size_odd);
+	TexCacheSize get_even_size() const;
+	u32 get_even_pos() const;
+	TexCacheSize get_odd_size() const;
+	u32 get_odd_pos() const;
+	bool is_mipmap_cache() const;
+
+	void invalidate_cache();
+	GXTexRegion *get_region();
+
+	TexCacheRegion();
+};
+
+// TODO: Dynamic texture region allocator?
 
 class RasterizerStorageGX : public RasterizerStorage {
 public:
 	/* TEXTURE API */
-	struct GXTexture : public RID_Data {
-		int width;
-		int height;
+	struct Texture : public RID_Data {
+		GXTexObj tex_obj; // GX Texture object description
+		Ref<Image> image; // GX Texture data
 		uint32_t flags;
-		Image::Format format;
-		Ref<Image> image;
 		String path;
 	};
 
@@ -33,68 +72,24 @@ public:
 		VS::BlendShapeMode blend_shape_mode;
 	};
 
-	mutable RID_Owner<GXTexture> texture_owner;
+	struct RenderTarget : public RID_Data {
+		RID texture;
+	};
+
+	RenderTarget *current_rt;
+
+	mutable RID_Owner<Texture> texture_owner;
 	mutable RID_Owner<GXMesh> mesh_owner;
 
-	RID texture_create() {
-
-		GXTexture *texture = memnew(GXTexture);
-		ERR_FAIL_COND_V(!texture, RID());
-		return texture_owner.make_rid(texture);
-	}
-
-	void texture_allocate(RID p_texture, int p_width, int p_height, int p_depth_3d, Image::Format p_format, VisualServer::TextureType p_type = VS::TEXTURE_TYPE_2D, uint32_t p_flags = VS::TEXTURE_FLAGS_DEFAULT) {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND(!t);
-		t->width = p_width;
-		t->height = p_height;
-		t->flags = p_flags;
-		t->format = p_format;
-		t->image = Ref<Image>(memnew(Image));
-		t->image->create(p_width, p_height, false, p_format);
-	}
-	void texture_set_data(RID p_texture, const Ref<Image> &p_image, int p_level) {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND(!t);
-		t->width = p_image->get_width();
-		t->height = p_image->get_height();
-		t->format = p_image->get_format();
-		t->image->create(t->width, t->height, false, t->format, p_image->get_data());
-	}
-
-	void texture_set_data_partial(RID p_texture, const Ref<Image> &p_image, int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int p_dst_mip, int p_level) {
-		GXTexture *t = texture_owner.get(p_texture);
-
-		ERR_FAIL_COND(!t);
-		ERR_FAIL_COND_MSG(p_image.is_null(), "It's not a reference to a valid Image object.");
-		ERR_FAIL_COND(t->format != p_image->get_format());
-		ERR_FAIL_COND(src_w <= 0 || src_h <= 0);
-		ERR_FAIL_COND(src_x < 0 || src_y < 0 || src_x + src_w > p_image->get_width() || src_y + src_h > p_image->get_height());
-		ERR_FAIL_COND(dst_x < 0 || dst_y < 0 || dst_x + src_w > t->width || dst_y + src_h > t->height);
-
-		t->image->blit_rect(p_image, Rect2(src_x, src_y, src_w, src_h), Vector2(dst_x, dst_y));
-	}
-
-	Ref<Image> texture_get_data(RID p_texture, int p_level) const {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND_V(!t, Ref<Image>());
-		return t->image;
-	}
-	void texture_set_flags(RID p_texture, uint32_t p_flags) {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND(!t);
-		t->flags = p_flags;
-	}
-	uint32_t texture_get_flags(RID p_texture) const {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND_V(!t, 0);
-		return t->flags;
-	}
-	Image::Format texture_get_format(RID p_texture) const {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND_V(!t, Image::FORMAT_RGB8);
-		return t->format;
-	}
+	RID texture_create();
+	void texture_allocate(RID p_texture, int p_width, int p_height, int p_depth_3d, Image::Format p_format, VisualServer::TextureType p_type = VS::TEXTURE_TYPE_2D, uint32_t p_flags = VS::TEXTURE_FLAGS_DEFAULT);
+	void texture_set_data(RID p_texture, const Ref<Image> &p_image, int p_level);
+	void texture_set_data_partial(RID p_texture, const Ref<Image> &p_image, int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int p_dst_mip, int p_level);
+	Ref<Image> texture_get_data(RID p_texture, int p_level) const;
+	void texture_set_flags(RID p_texture, uint32_t p_flags);
+	uint32_t texture_get_flags(RID p_texture) const;
+	Image::Format texture_get_format(RID p_texture) const;
+	static void _setup_texture_regions();
 
 	VisualServer::TextureType texture_get_type(RID p_texture) const { return VS::TEXTURE_TYPE_2D; }
 	uint32_t texture_get_texid(RID p_texture) const { return 0; }
@@ -104,16 +99,8 @@ public:
 	void texture_set_size_override(RID p_texture, int p_width, int p_height, int p_depth_3d) {}
 	void texture_bind(RID p_texture, uint32_t p_texture_no) {}
 
-	void texture_set_path(RID p_texture, const String &p_path) {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND(!t);
-		t->path = p_path;
-	}
-	String texture_get_path(RID p_texture) const {
-		GXTexture *t = texture_owner.getornull(p_texture);
-		ERR_FAIL_COND_V(!t, String());
-		return t->path;
-	}
+	void texture_set_path(RID p_texture, const String &p_path);
+	String texture_get_path(RID p_texture) const;
 
 	void texture_set_shrink_all_x2_on_set_data(bool p_enable) {}
 
@@ -582,10 +569,12 @@ public:
 
 	/* RENDER TARGET */
 
-	RID render_target_create() { return RID(); }
+	mutable RID_Owner<RenderTarget> render_target_owner;
+
+	RID render_target_create();
 	void render_target_set_position(RID p_render_target, int p_x, int p_y) {}
-	void render_target_set_size(RID p_render_target, int p_width, int p_height) {}
-	RID render_target_get_texture(RID p_render_target) const { return RID(); }
+	void render_target_set_size(RID p_render_target, int p_width, int p_height);
+	RID render_target_get_texture(RID p_render_target) const;
 	void render_target_set_external_texture(RID p_render_target, unsigned int p_texture_id) {}
 	void render_target_set_flag(RID p_render_target, RenderTargetFlags p_flag, bool p_value) {}
 	bool render_target_was_used(RID p_render_target) { return false; }
@@ -612,7 +601,7 @@ public:
 	bool free(RID p_rid) {
 		if (texture_owner.owns(p_rid)) {
 			// delete the texture
-			GXTexture *texture = texture_owner.get(p_rid);
+			Texture *texture = texture_owner.get(p_rid);
 			texture_owner.free(p_rid);
 			memdelete(texture);
 		} else if (mesh_owner.owns(p_rid)) {
@@ -648,7 +637,7 @@ public:
 
 	static RasterizerStorage *base_singleton;
 
-	RasterizerStorageGX(){};
+	RasterizerStorageGX() {};
 	~RasterizerStorageGX() {}
 };
 

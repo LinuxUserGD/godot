@@ -344,7 +344,8 @@ void Main::print_help(const char *p_binary) {
 #ifdef WII
 #include <wiiuse/wpad.h>
 #include <gccore.h>
-#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
+//#define _break(...) printf(__VA_ARGS__);while(1){WPAD_ScanPads();u32 pressed = WPAD_ButtonsDown(0);if(pressed & WPAD_BUTTON_HOME)break;VIDEO_WaitVSync();}
+#define _break(...) printf(__VA_ARGS__)
 #else
 #define _break(...)
 #endif
