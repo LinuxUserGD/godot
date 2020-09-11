@@ -8,7 +8,7 @@ os_wii = [
     "dir_access_wii.cpp",
     "ip_wii.cpp",
     "audio_driver_wii.cpp",
-    #"gx/rasterizer_gx.cpp",
+    "gx/rasterizer_gx.cpp",
     "gx/rasterizer_storage_gx.cpp",
     "gx/rasterizer_canvas_gx.cpp",
     "gx/rasterizer_scene_gx.cpp"
