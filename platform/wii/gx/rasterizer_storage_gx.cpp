@@ -104,13 +104,19 @@ RID RasterizerStorageGX::texture_create() {
 void RasterizerStorageGX::texture_allocate(RID p_texture, int p_width, int p_height, int p_depth_3d, Image::Format p_format, VisualServer::TextureType p_type, uint32_t p_flags) {
     Texture *t = texture_owner.getornull(p_texture);
     ERR_FAIL_COND(!t);
-    t->image = Ref<Image>(memnew(Image));
+    if(t->image.is_null())
+        t->image.instance();
     t->image->create(p_width, p_height, false, p_format);
 }
+
+#define IS_32_ALIGNED(ptr) ((reinterpret_cast<intptr_t>(ptr) % 32) == 0)
 
 void RasterizerStorageGX::texture_set_data(RID p_texture, const Ref<Image> &p_image, int p_level) {
     Texture *t = texture_owner.getornull(p_texture);
     ERR_FAIL_COND(!t);
+    ERR_FAIL_COND(!IS_32_ALIGNED(p_image->get_data().read().ptr()));
+    if(t->image.is_null())
+        t->image.instance();
     t->image->create(p_image->get_width(), p_image->get_height(), false, p_image->get_format(), p_image->get_data());
 }
 
@@ -146,6 +152,7 @@ uint32_t RasterizerStorageGX::texture_get_flags(RID p_texture) const {
 Image::Format RasterizerStorageGX::texture_get_format(RID p_texture) const {
     Texture *t = texture_owner.getornull(p_texture);
     ERR_FAIL_COND_V(!t, Image::FORMAT_RGB8);
+    ERR_FAIL_COND_V(t->image.is_null(), Image::FORMAT_RGB8);
     return t->image->get_format();
 }
 

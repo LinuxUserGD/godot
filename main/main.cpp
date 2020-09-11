@@ -1361,7 +1361,6 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 			Ref<Image> splash = (editor || project_manager) ? memnew(Image(boot_splash_editor_png)) : memnew(Image(boot_splash_png));
 #else
 			Ref<Image> splash = memnew(Image(boot_splash_png));
-			_break("Loaded boot logo!");
 #endif
 
 			MAIN_PRINT("Main: ClearColor");
