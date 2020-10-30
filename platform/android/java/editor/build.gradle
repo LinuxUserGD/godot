@@ -10,10 +10,17 @@ dependencies {
 android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion versions.buildTools
+    ndkVersion versions.ndkVersion
+
     defaultConfig {
         applicationId "org.godotengine.editor"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
+    }
+
+    compileOptions {
+        sourceCompatibility versions.javaVersion
+        targetCompatibility versions.javaVersion
     }
 
     buildTypes {
