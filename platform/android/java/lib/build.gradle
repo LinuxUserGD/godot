@@ -27,6 +27,10 @@ android {
         targetCompatibility versions.javaVersion
     }
 
+    buildTypes {
+        release_debug {}
+    }
+
     lintOptions {
         abortOnError false
         disable 'MissingTranslation', 'UnusedResources'
@@ -51,6 +55,7 @@ android {
             assets.srcDirs = ['assets']
         }
         debug.jniLibs.srcDirs = ['libs/debug']
+        release_debug.jniLibs.srcDirs = ['libs/debug']
         release.jniLibs.srcDirs = ['libs/release']
     }
 
@@ -106,7 +111,7 @@ android {
         def taskName = getSconsTaskName(buildType)
         tasks.create(name: taskName, type: Exec) {
             executable sconsExecutableFile.absolutePath
-            args "--directory=${pathToRootDir}", "platform=android", "target=${releaseTarget}", "android_arch=${defaultAbi}", "-j" + Runtime.runtime.availableProcessors()
+            args "tools=${tools}", "--directory=${pathToRootDir}", "platform=android", "target=${releaseTarget}", "android_arch=${defaultAbi}", "-j" + Runtime.runtime.availableProcessors()
         }
 
         // Schedule the tasks so the generated libs are present before the aar file is packaged.
