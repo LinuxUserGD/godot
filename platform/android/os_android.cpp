@@ -351,7 +351,7 @@ OS_Android::OS_Android(GodotJavaWrapper *p_godot_java, GodotIOJavaWrapper *p_god
 	DisplayServerAndroid::register_android_driver();
 }
 
-Error OS_Android::execute(const String &p_path, const List<String> &p_arguments, bool p_blocking, ProcessID *r_child_id, String *r_pipe, int *r_exitcode, bool read_stderr, Mutex *p_pipe_mutex) {
+Error OS_Android::execute(const String &p_path, const List<String> &p_arguments, String *r_pipe, int *r_exitcode, bool read_stderr, Mutex *p_pipe_mutex) {
 	if (p_path == "/system/bin/app_process64") {
 		bool isEditor = false;
 		for (int i = 0; i < p_arguments.size(); i++) {
@@ -362,7 +362,7 @@ Error OS_Android::execute(const String &p_path, const List<String> &p_arguments,
 		godot_java->call_intent_with_command_line_args(isEditor ? "org.godotengine.editor.GodotEditor" : "org.godotengine.editor.GodotGame", p_arguments);
 		return OK;
 	} else {
-		return OS_Unix::execute(p_path, p_arguments, p_blocking, r_child_id, r_pipe, r_exitcode, read_stderr, p_pipe_mutex);
+		return OS_Unix::execute(p_path, p_arguments, r_pipe, r_exitcode, read_stderr, p_pipe_mutex);
 	}
 }
 

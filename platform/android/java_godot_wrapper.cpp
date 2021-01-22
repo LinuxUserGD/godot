@@ -335,7 +335,7 @@ void GodotJavaWrapper::vibrate(int p_duration_ms) {
 
 void GodotJavaWrapper::call_intent_with_command_line_args(String intent, List<String> args) {
 	if (_call_intent_with_command_line_args) {
-		JNIEnv *env = ThreadAndroid::get_env();
+		JNIEnv *env = get_jni_env();
 		jstring jStrIntent = env->NewStringUTF(intent.utf8().get_data());
 		jobjectArray jargs = env->NewObjectArray(args.size(), env->FindClass("java/lang/String"), env->NewStringUTF(""));
 		for (int i = 0; i < args.size(); i++) {
