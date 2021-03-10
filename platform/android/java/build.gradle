@@ -122,6 +122,39 @@ task zipCustomBuild(type: Zip) {
     destinationDir(file(binDir))
 }
 
+task generateDevTemplate (type: GradleBuild) {
+    // add parameter to set symbols to true
+    startParameter.projectProperties += [doNotStrip: true]
+
+    // We exclude these gradle tasks so we can run the scons command manually.
+    for (String buildType : supportedTargets) {
+        startParameter.excludedTaskNames += ":lib:" + getSconsTaskName(buildType)
+    }
+
+    tasks = []
+
+    // Only build the apks and aar files for which we have native shared libraries.
+    for (String target : supportedTargets) {
+        File targetLibs = new File("lib/libs/" + target)
+        if (targetLibs != null
+            && targetLibs.isDirectory()
+            && targetLibs.listFiles() != null
+            && targetLibs.listFiles().length > 0) {
+            String capitalizedTarget = target.capitalize()
+            // Copy the generated aar library files to the custom build directory.
+            tasks += "copy" + capitalizedTarget + "AARToAppModule"
+            // Copy the generated aar library files to the bin directory.
+            tasks += "copy" + capitalizedTarget + "AARToBin"
+            // Copy the prebuilt binary templates to the bin directory.
+            tasks += "copy" + capitalizedTarget + "BinaryToBin"
+        } else {
+            logger.lifecycle("No native shared libs for target $target. Skipping build.")
+        }
+    }
+
+    finalizedBy 'zipCustomBuild'
+}
+
 /**
  * Master task used to coordinate the tasks defined above to generate the set of Godot templates.
  */
