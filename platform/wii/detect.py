@@ -150,7 +150,8 @@ def configure(env):
         if platform.system() != "Windows":
             dkp_path = os.getenv("DEVKITPRO")
             env["dkp_path"] = dkp_path
-        else:
+        
+        if not dkp_path:
             print("ERR: Please define 'dkp_path' to point to your DevKitPro folder.")
             exit(1)
     ppc_path = dkp_path + "/devkitPPC"
@@ -163,7 +164,7 @@ def configure(env):
     env["AR"] = tools_path + tool_prefix + "ar"
     env["RANLIB"] = tools_path + tool_prefix + "ranlib"
 
-    env.Append(
+    env.Prepend(
     CPPPATH=[
         dkp_path + "/libogc/include",
         ppc_path + "/powerpc-eabi/include"
