@@ -186,7 +186,7 @@ def configure(env):
     ])
 
     if env["use_portlib_freetype"] or env["use_portlib_libpng"]:
-        env.Append(
+        env.Prepend(
             LIBPATH=[
                 dkp_path + "/portlibs/ppc/lib"
             ]
@@ -194,7 +194,7 @@ def configure(env):
 
     if env["use_portlib_freetype"] and env["module_freetype_enabled"]:
         env["builtin_freetype"] = False
-        env.Append(
+        env.Prepend(
             CPPPATH=[
                 dkp_path + "/portlibs/ppc/include/freetype2"
             ],
@@ -202,7 +202,7 @@ def configure(env):
         )
     if env["use_portlib_libpng"]:
         env["builtin_libpng"] = False
-        env.Append(
+        env.Prepend(
             CPPPATH=[
                 dkp_path + "/portlibs/ppc/include/libpng16"
             ],
@@ -211,7 +211,7 @@ def configure(env):
     
     if env["use_portlib_zlib"]:
         env["builtin_zlib"] = False
-        env.Append(
+        env.Prepend(
             CPPPATH=[
                 dkp_path + "/portlibs/ppc/include"
             ],
