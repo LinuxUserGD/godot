@@ -280,6 +280,7 @@ opts.Add(BoolVariable("builtin_zstd", "Use the built-in Zstd library", True))
 # be overridden for a specific platform), the lowercase ones are appended.
 opts.Add("CXX", "C++ compiler binary")
 opts.Add("CC", "C compiler binary")
+opts.Add("AR", "Archiver")
 opts.Add("LINK", "Linker binary")
 opts.Add("cppdefines", "Custom defines for the pre-processor")
 opts.Add("ccflags", "Custom flags for both the C and C++ compilers")

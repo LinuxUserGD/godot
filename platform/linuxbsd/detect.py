@@ -511,8 +511,8 @@ def configure(env: "SConsEnvironment"):
     # Link those statically for portability
     if env["use_static_cpp"]:
         env.Append(LINKFLAGS=["-static-libgcc", "-static-libstdc++"])
-        if env["use_llvm"] and platform.system() != "FreeBSD":
+        if env["use_llvm"] and platform.system() != "FreeBSD" and not env["arch"] == "x86_64":
             env["LINKCOM"] = env["LINKCOM"] + " -l:libatomic.a"
     else:
-        if env["use_llvm"] and platform.system() != "FreeBSD":
+        if env["use_llvm"] and platform.system() != "FreeBSD" and not env["arch"] == "x86_64":
             env.Append(LIBS=["atomic"])
