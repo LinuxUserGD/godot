@@ -201,9 +201,9 @@ opts.Add(
         "optimize", "Optimization level", "speed_trace", ("none", "custom", "debug", "speed", "speed_trace", "size")
     )
 )
-opts.Update(env_base)
-env_base.gdscript_build = env_base["target"] == "gdscript"
-if_non_gdscript = not env_base.gdscript_build
+opts.Update(env)
+env.gdscript_build = env["target"] == "gdscript"
+if_non_gdscript = not env.gdscript_build
 
 opts.Add(BoolVariable("debug_symbols", "Build with debugging symbols", False))
 opts.Add(BoolVariable("separate_debug_symbols", "Extract debugging symbols to a separate file", False))
