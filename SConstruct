@@ -191,7 +191,9 @@ if env.scons_version >= (4, 3):
 else:
     opts.Add("platform", "Target platform (%s)" % "|".join(platform_list), "")
     opts.Add("p", "Alias for 'platform'", "")
-opts.Add(EnumVariable("target", "Compilation target", "editor", ("editor", "template_release", "template_debug", "gdscript")))
+opts.Add(
+    EnumVariable("target", "Compilation target", "editor", ("editor", "template_release", "template_debug", "gdscript"))
+)
 opts.Add(EnumVariable("arch", "CPU architecture", "auto", ["auto"] + architectures, architecture_aliases))
 opts.Add(BoolVariable("dev_build", "Developer build with dev-only debugging code (DEV_ENABLED)", False))
 opts.Add(
