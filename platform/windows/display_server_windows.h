@@ -337,7 +337,7 @@ class DisplayServerWindows : public DisplayServer {
 
 	struct KeyEvent {
 		WindowID window_id;
-		bool alt, shift, control, meta;
+		bool alt, shift, control, meta, altgr;
 		UINT uMsg;
 		WPARAM wParam;
 		LPARAM lParam;
@@ -389,6 +389,7 @@ class DisplayServerWindows : public DisplayServer {
 		bool borderless = false;
 		bool resizable = true;
 		bool window_focused = false;
+		int activate_state = 0;
 		bool was_maximized = false;
 		bool always_on_top = false;
 		bool no_focus = false;
@@ -402,6 +403,7 @@ class DisplayServerWindows : public DisplayServer {
 
 		// Timers.
 		uint32_t move_timer_id = 0U;
+		uint32_t activate_timer_id = 0U;
 
 		HANDLE wtctx;
 		LOGCONTEXTW wtlc;
@@ -464,6 +466,7 @@ class DisplayServerWindows : public DisplayServer {
 	WNDPROC user_proc = nullptr;
 
 	struct IndicatorData {
+		RID menu_rid;
 		Callable callback;
 	};
 
@@ -475,12 +478,7 @@ class DisplayServerWindows : public DisplayServer {
 
 	MouseMode mouse_mode;
 	int restore_mouse_trails = 0;
-	bool alt_mem = false;
-	bool gr_mem = false;
-	bool shift_mem = false;
-	bool control_mem = false;
-	bool meta_mem = false;
-	BitField<MouseButtonMask> last_button_state;
+
 	bool use_raw_input = false;
 	bool drop_events = false;
 	bool in_dispatch_input_event = false;
@@ -507,7 +505,7 @@ class DisplayServerWindows : public DisplayServer {
 	WindowID _get_focused_window_or_popup() const;
 	void _register_raw_input_devices(WindowID p_target_window);
 
-	void _process_activate_event(WindowID p_window_id, WPARAM wParam, LPARAM lParam);
+	void _process_activate_event(WindowID p_window_id);
 	void _process_key_events();
 
 	static void _dispatch_input_events(const Ref<InputEvent> &p_event);
@@ -515,6 +513,15 @@ class DisplayServerWindows : public DisplayServer {
 
 	LRESULT _handle_early_window_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	Point2i _get_screens_origin() const;
+
+	enum class WinKeyModifierMask {
+		ALT_GR = (1 << 1),
+		SHIFT = (1 << 2),
+		ALT = (1 << 3),
+		META = (1 << 4),
+		CTRL = (1 << 5),
+	};
+	BitField<WinKeyModifierMask> _get_mods() const;
 
 	Error _file_dialog_with_options_show(const String &p_title, const String &p_current_directory, const String &p_root, const String &p_filename, bool p_show_hidden, FileDialogMode p_mode, const Vector<String> &p_filters, const TypedArray<Dictionary> &p_options, const Callable &p_callback, bool p_options_in_cb);
 
@@ -684,19 +691,23 @@ public:
 	virtual void set_native_icon(const String &p_filename) override;
 	virtual void set_icon(const Ref<Image> &p_icon) override;
 
-	virtual IndicatorID create_status_indicator(const Ref<Image> &p_icon, const String &p_tooltip, const Callable &p_callback) override;
-	virtual void status_indicator_set_icon(IndicatorID p_id, const Ref<Image> &p_icon) override;
+	virtual IndicatorID create_status_indicator(const Ref<Texture2D> &p_icon, const String &p_tooltip, const Callable &p_callback) override;
+	virtual void status_indicator_set_icon(IndicatorID p_id, const Ref<Texture2D> &p_icon) override;
 	virtual void status_indicator_set_tooltip(IndicatorID p_id, const String &p_tooltip) override;
+	virtual void status_indicator_set_menu(IndicatorID p_id, const RID &p_rid) override;
 	virtual void status_indicator_set_callback(IndicatorID p_id, const Callable &p_callback) override;
+	virtual Rect2 status_indicator_get_rect(IndicatorID p_id) const override;
 	virtual void delete_status_indicator(IndicatorID p_id) override;
 
 	virtual void set_context(Context p_context) override;
 
-	static DisplayServer *create_func(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Error &r_error);
+	virtual bool is_window_transparency_available() const override;
+
+	static DisplayServer *create_func(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, Error &r_error);
 	static Vector<String> get_rendering_drivers_func();
 	static void register_windows_driver();
 
-	DisplayServerWindows(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Error &r_error);
+	DisplayServerWindows(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, Error &r_error);
 	~DisplayServerWindows();
 };
 

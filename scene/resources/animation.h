@@ -43,6 +43,8 @@ class Animation : public Resource {
 public:
 	typedef uint32_t TypeHash;
 
+	static inline String PARAMETERS_BASE_PATH = "parameters/";
+
 	enum TrackType {
 		TYPE_VALUE, // Set a value in a property, can be interpolated.
 		TYPE_POSITION_3D, // Position 3D track, can be compressed.
@@ -268,6 +270,8 @@ private:
 	double length = 1.0;
 	real_t step = 1.0 / 30;
 	LoopMode loop_mode = LOOP_NONE;
+	bool capture_included = false;
+	void _check_capture_included();
 
 	void _track_update_hash(int p_track);
 
@@ -391,6 +395,9 @@ protected:
 public:
 	int add_track(TrackType p_type, int p_at_pos = -1);
 	void remove_track(int p_track);
+
+	void set_capture_included(bool p_capture_included);
+	bool is_capture_included() const;
 
 	int get_track_count() const;
 	TrackType track_get_type(int p_track) const;
