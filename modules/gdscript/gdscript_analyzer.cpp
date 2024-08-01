@@ -648,7 +648,7 @@ Error GDScriptAnalyzer::resolve_class_inheritance(GDScriptParser::ClassNode *p_c
 
 	return OK;
 }
-
+#ifndef GDSCRIPT_BUILD
 GDScriptParser::DataType GDScriptAnalyzer::resolve_datatype(GDScriptParser::TypeNode *p_type) {
 	GDScriptParser::DataType bad_type;
 	bad_type.kind = GDScriptParser::DataType::VARIANT;
@@ -956,6 +956,7 @@ GDScriptParser::DataType GDScriptAnalyzer::resolve_datatype(GDScriptParser::Type
 	p_type->set_datatype(result);
 	return result;
 }
+#endif
 
 void GDScriptAnalyzer::resolve_class_member(GDScriptParser::ClassNode *p_class, const StringName &p_name, const GDScriptParser::Node *p_source) {
 	ERR_FAIL_COND(!p_class->has_member(p_name));
@@ -4502,6 +4503,7 @@ void GDScriptAnalyzer::reduce_identifier(GDScriptParser::IdentifierNode *p_ident
 		return;
 	}
 
+#ifndef GDSCRIPT_BUILD
 	// Try singletons.
 	// Do this before globals because this might be a singleton loading another one before it's compiled.
 	if (ProjectSettings::get_singleton()->has_autoload(name)) {
@@ -4544,6 +4546,7 @@ void GDScriptAnalyzer::reduce_identifier(GDScriptParser::IdentifierNode *p_ident
 			return;
 		}
 	}
+#endif // GDSCRIPT_BUILD
 
 	if (CoreConstants::is_global_constant(name)) {
 		int index = CoreConstants::get_global_constant_index(name);

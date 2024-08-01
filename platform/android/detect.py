@@ -23,7 +23,7 @@ def get_tools(env: "SConsEnvironment"):
     return ["clang", "clang++", "as", "ar", "link"]
 
 
-def get_opts():
+def get_opts(_gdscript_build: bool):
     from SCons.Variables import BoolVariable
 
     return [
