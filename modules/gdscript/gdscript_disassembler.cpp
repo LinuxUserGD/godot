@@ -28,7 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifdef DEBUG_ENABLED
+#if defined(DEBUG_ENABLED) || defined(GDSCRIPT_BUILD)
 
 #include "gdscript.h"
 #include "gdscript_function.h"
@@ -889,17 +889,20 @@ void GDScriptFunction::disassemble(const Vector<String> &p_code_lines) const {
 				GDScriptFunction *lambda = _lambdas_ptr[_code_ptr[ip + 2 + instr_var_args]];
 
 				text += DADDR(1 + captures_count);
-				text += "create lambda from ";
-				text += lambda->name.operator String();
-				text += "function, captures (";
+				text += " = create lambda from ";
+				text += lambda->name;
+				text += " function";
 
-				for (int i = 0; i < captures_count; i++) {
-					if (i > 0) {
-						text += ", ";
+				if (captures_count) {
+					text += ", captures (";
+					for (int i = 0; i < captures_count; i++) {
+						if (i > 0) {
+							text += ", ";
+						}
+						text += DADDR(1 + i);
 					}
-					text += DADDR(1 + i);
+					text += ")";
 				}
-				text += ")";
 
 				incr = 4 + captures_count;
 			} break;
@@ -909,17 +912,20 @@ void GDScriptFunction::disassemble(const Vector<String> &p_code_lines) const {
 				GDScriptFunction *lambda = _lambdas_ptr[_code_ptr[ip + 2 + instr_var_args]];
 
 				text += DADDR(1 + captures_count);
-				text += "create self lambda from ";
-				text += lambda->name.operator String();
-				text += "function, captures (";
+				text += " = create self lambda from ";
+				text += lambda->name;
+				text += " function";
 
-				for (int i = 0; i < captures_count; i++) {
-					if (i > 0) {
-						text += ", ";
+				if (captures_count) {
+					text += ", captures (";
+					for (int i = 0; i < captures_count; i++) {
+						if (i > 0) {
+							text += ", ";
+						}
+						text += DADDR(1 + i);
 					}
-					text += DADDR(1 + i);
+					text += ")";
 				}
-				text += ")";
 
 				incr = 4 + captures_count;
 			} break;
@@ -1180,5 +1186,4 @@ void GDScriptFunction::disassemble(const Vector<String> &p_code_lines) const {
 		}
 	}
 }
-
-#endif // DEBUG_ENABLED
+#endif // DEBUG_ENABLED || GDSCRIPT_BUILD

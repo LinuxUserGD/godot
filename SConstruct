@@ -60,9 +60,13 @@ import scu_builders
 from methods import print_error, print_warning
 from platform_methods import architecture_aliases, architectures
 
+gdscript_build = False
 if ARGUMENTS.get("target", "editor") == "editor":
     _helper_module("editor.editor_builders", "editor/editor_builders.py")
     _helper_module("editor.template_builders", "editor/template_builders.py")
+elif ARGUMENTS.get("target") == "gdscript":
+    # Check early so we can disable platform specific modules like rendering and audio
+    gdscript_build = True
 
 # Enable ANSI escape code support on Windows 10 and later (for colored console output).
 # <https://github.com/python/cpython/issues/73245>
@@ -120,7 +124,7 @@ for x in sorted(glob.glob("platform/*")):
         x = x.replace("platform/", "")  # rest of world
         x = x.replace("platform\\", "")  # win32
         platform_list += [x]
-        platform_opts[x] = detect.get_opts()
+        platform_opts[x] = detect.get_opts(gdscript_build)
         platform_flags[x] = detect.get_flags()
         if isinstance(platform_flags[x], list):  # backwards compatibility
             platform_flags[x] = {flag[0]: flag[1] for flag in platform_flags[x]}
@@ -195,7 +199,9 @@ if env.scons_version >= (4, 3):
 else:
     opts.Add("platform", "Target platform (%s)" % "|".join(platform_list), "")
     opts.Add("p", "Alias for 'platform'", "")
-opts.Add(EnumVariable("target", "Compilation target", "editor", ("editor", "template_release", "template_debug")))
+opts.Add(
+    EnumVariable("target", "Compilation target", "editor", ("editor", "template_release", "template_debug", "gdscript"))
+)
 opts.Add(EnumVariable("arch", "CPU architecture", "auto", ["auto"] + architectures, architecture_aliases))
 opts.Add(BoolVariable("dev_build", "Developer build with dev-only debugging code (DEV_ENABLED)", False))
 opts.Add(
@@ -206,6 +212,10 @@ opts.Add(
         ("auto", "none", "custom", "debug", "speed", "speed_trace", "size"),
     )
 )
+opts.Update(env)
+env.gdscript_build = env["target"] == "gdscript"
+if_non_gdscript = not env.gdscript_build
+
 opts.Add(BoolVariable("debug_symbols", "Build with debugging symbols", False))
 opts.Add(BoolVariable("separate_debug_symbols", "Extract debugging symbols to a separate file", False))
 opts.Add(BoolVariable("debug_paths_relative", "Make file paths in debug symbols relative (if supported)", False))
@@ -216,14 +226,14 @@ opts.Add(BoolVariable("threads", "Enable threading support", True))
 # Components
 opts.Add(BoolVariable("deprecated", "Enable compatibility code for deprecated and removed features", True))
 opts.Add(EnumVariable("precision", "Set the floating-point precision level", "single", ("single", "double")))
-opts.Add(BoolVariable("minizip", "Enable ZIP archive support using minizip", True))
-opts.Add(BoolVariable("brotli", "Enable Brotli for decompresson and WOFF2 fonts support", True))
+opts.Add(BoolVariable("minizip", "Enable ZIP archive support using minizip", if_non_gdscript))
+opts.Add(BoolVariable("brotli", "Enable Brotli for decompresson and WOFF2 fonts support", if_non_gdscript))
 opts.Add(BoolVariable("xaudio2", "Enable the XAudio2 audio driver", False))
-opts.Add(BoolVariable("vulkan", "Enable the vulkan rendering driver", True))
-opts.Add(BoolVariable("opengl3", "Enable the OpenGL/GLES3 rendering driver", True))
+opts.Add(BoolVariable("vulkan", "Enable the vulkan rendering driver", if_non_gdscript))
+opts.Add(BoolVariable("opengl3", "Enable the OpenGL/GLES3 rendering driver", if_non_gdscript))
 opts.Add(BoolVariable("d3d12", "Enable the Direct3D 12 rendering driver", False))
-opts.Add(BoolVariable("openxr", "Enable the OpenXR driver", True))
-opts.Add(BoolVariable("use_volk", "Use the volk library to load the Vulkan loader dynamically", True))
+opts.Add(BoolVariable("openxr", "Enable the OpenXR driver", if_non_gdscript))
+opts.Add(BoolVariable("use_volk", "Use the volk library to load the Vulkan loader dynamically", if_non_gdscript))
 opts.Add(BoolVariable("disable_exceptions", "Force disabling exception handling code", True))
 opts.Add("custom_modules", "A list of comma-separated directory paths containing custom modules to build.", "")
 opts.Add(BoolVariable("custom_modules_recursive", "Detect custom modules recursively for each specified path.", True))
@@ -246,7 +256,11 @@ opts.Add("import_env_vars", "A comma-separated list of environment variables to 
 opts.Add(BoolVariable("disable_3d", "Disable 3D nodes for a smaller executable", False))
 opts.Add(BoolVariable("disable_advanced_gui", "Disable advanced GUI nodes and behaviors", False))
 opts.Add("build_profile", "Path to a file containing a feature build profile", "")
-opts.Add(BoolVariable("modules_enabled_by_default", "If no, disable all modules except ones explicitly enabled", True))
+opts.Add(
+    BoolVariable(
+        "modules_enabled_by_default", "If no, disable all modules except ones explicitly enabled", if_non_gdscript
+    )
+)
 opts.Add(BoolVariable("no_editor_splash", "Don't use the custom splash screen for the editor", True))
 opts.Add(
     "system_certs_path",
@@ -423,7 +437,7 @@ for name, path in modules_detected.items():
     sys.path.insert(0, path)
     import config
 
-    if env["modules_enabled_by_default"]:
+    if env["modules_enabled_by_default"] or (env.gdscript_build and name == "gdscript"):
         enabled = True
         try:
             enabled = config.is_enabled()
@@ -467,7 +481,7 @@ env.platform_apis = platform_apis
 
 env.editor_build = env["target"] == "editor"
 env.dev_build = env["dev_build"]
-env.debug_features = env["target"] in ["editor", "template_debug"]
+env.debug_features = env["target"] in ["editor", "template_debug", "gdscript"]
 
 if env["optimize"] == "auto":
     if env.dev_build:
@@ -482,6 +496,9 @@ env["debug_symbols"] = methods.get_cmdline_bool("debug_symbols", env.dev_build)
 
 if env.editor_build:
     env.Append(CPPDEFINES=["TOOLS_ENABLED"])
+
+if env.gdscript_build:
+    env.Append(CPPDEFINES=["GDSCRIPT_BUILD"])
 
 if env.debug_features:
     # DEBUG_ENABLED enables debugging *features* and debug-only code, which is intended
@@ -1040,8 +1057,9 @@ if env["threads"]:
 Export("env")
 
 SConscript("core/SCsub")
-SConscript("servers/SCsub")
-SConscript("scene/SCsub")
+if not env.gdscript_build:
+    SConscript("servers/SCsub")
+    SConscript("scene/SCsub")
 if env.editor_build:
     SConscript("editor/SCsub")
 SConscript("drivers/SCsub")
@@ -1050,7 +1068,11 @@ SConscript("platform/SCsub")
 SConscript("modules/SCsub")
 if env["tests"]:
     SConscript("tests/SCsub")
-SConscript("main/SCsub")
+
+if env.gdscript_build:
+    SConscript("modules/gdscript/main/SCsub")
+else:
+    SConscript("main/SCsub")
 
 SConscript("platform/" + env["platform"] + "/SCsub")  # Build selected platform.
 

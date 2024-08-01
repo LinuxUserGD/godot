@@ -4274,6 +4274,7 @@ void GDScriptAnalyzer::reduce_identifier(GDScriptParser::IdentifierNode *p_ident
 		return;
 	}
 
+#ifndef GDSCRIPT_BUILD
 	// Try singletons.
 	// Do this before globals because this might be a singleton loading another one before it's compiled.
 	if (ProjectSettings::get_singleton()->has_autoload(name)) {
@@ -4316,6 +4317,7 @@ void GDScriptAnalyzer::reduce_identifier(GDScriptParser::IdentifierNode *p_ident
 			return;
 		}
 	}
+#endif // GDSCRIPT_BUILD
 
 	if (CoreConstants::is_global_constant(name)) {
 		int index = CoreConstants::get_global_constant_index(name);
