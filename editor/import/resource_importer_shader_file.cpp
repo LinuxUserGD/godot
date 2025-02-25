@@ -114,9 +114,8 @@ Error ResourceImporterShaderFile::import(ResourceUID::ID p_source_id, const Stri
 	}
 
 	ResourceSaver::save(shader_file, p_save_path + ".res");
-
-	return OK;
 #endif // RD_ENABLED
+	return OK;
 }
 
 ResourceImporterShaderFile::ResourceImporterShaderFile() {

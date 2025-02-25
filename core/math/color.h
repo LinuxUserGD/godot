@@ -35,7 +35,7 @@
 
 class String;
 
-struct [[nodiscard]] Color {
+struct Color {
 	union {
 		struct {
 			float r;
