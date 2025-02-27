@@ -83,16 +83,20 @@
 
 // 2D physics and navigation.
 #include "navigation_server_2d.h"
+#ifndef PHYSICS_2D_DISABLED
 #include "physics_server_2d.h"
 #include "physics_server_2d_dummy.h"
 #include "servers/extensions/physics_server_2d_extension.h"
+#endif // PHYSICS_2D_DISABLED
 
 // 3D physics and navigation (3D navigation is needed for 2D).
 #include "navigation_server_3d.h"
 #ifndef _3D_DISABLED
+#ifndef PHYSICS_3D_DISABLED
 #include "physics_server_3d.h"
 #include "physics_server_3d_dummy.h"
 #include "servers/extensions/physics_server_3d_extension.h"
+#endif // PHYSICS_3D_DISABLED
 #include "xr/xr_body_tracker.h"
 #include "xr/xr_controller_tracker.h"
 #include "xr/xr_face_tracker.h"
@@ -105,15 +109,17 @@
 
 ShaderTypes *shader_types = nullptr;
 
-#ifndef _3D_DISABLED
-static PhysicsServer3D *_create_dummy_physics_server_3d() {
-	return memnew(PhysicsServer3DDummy);
-}
-#endif // _3D_DISABLED
-
+#ifndef PHYSICS_2D_DISABLED
 static PhysicsServer2D *_create_dummy_physics_server_2d() {
 	return memnew(PhysicsServer2DDummy);
 }
+#endif // PHYSICS_2D_DISABLED
+
+#ifndef PHYSICS_3D_DISABLED
+static PhysicsServer3D *_create_dummy_physics_server_3d() {
+	return memnew(PhysicsServer3DDummy);
+}
+#endif // PHYSICS_3D_DISABLED
 
 static bool has_server_feature_callback(const String &p_feature) {
 	if (RenderingServer::get_singleton()) {
@@ -251,6 +257,7 @@ void register_server_types() {
 
 	ServersDebugger::initialize();
 
+#ifndef PHYSICS_2D_DISABLED
 	// Physics 2D
 	GDREGISTER_CLASS(PhysicsServer2DManager);
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer2DManager", PhysicsServer2DManager::get_singleton(), "PhysicsServer2DManager"));
@@ -276,12 +283,13 @@ void register_server_types() {
 	GLOBAL_DEF(PropertyInfo(Variant::STRING, PhysicsServer2DManager::setting_property_name, PROPERTY_HINT_ENUM, "DEFAULT"), "DEFAULT");
 
 	PhysicsServer2DManager::get_singleton()->register_server("Dummy", callable_mp_static(_create_dummy_physics_server_2d));
+#endif // PHYSICS_2D_DISABLED
 
 	GDREGISTER_ABSTRACT_CLASS(NavigationServer2D);
 	GDREGISTER_CLASS(NavigationPathQueryParameters2D);
 	GDREGISTER_CLASS(NavigationPathQueryResult2D);
 
-#ifndef _3D_DISABLED
+#ifndef PHYSICS_3D_DISABLED
 	// Physics 3D
 	GDREGISTER_CLASS(PhysicsServer3DManager);
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer3DManager", PhysicsServer3DManager::get_singleton(), "PhysicsServer3DManager"));
@@ -321,7 +329,7 @@ void register_server_types() {
 	GDREGISTER_CLASS(XRPositionalTracker);
 	GDREGISTER_CLASS(XRServer);
 	GDREGISTER_ABSTRACT_CLASS(XRTracker);
-#endif // _3D_DISABLED
+#endif // PHYSICS_3D_DISABLED
 
 	GDREGISTER_ABSTRACT_CLASS(NavigationServer3D);
 	GDREGISTER_CLASS(NavigationPathQueryParameters3D);
@@ -358,9 +366,13 @@ void register_server_singletons() {
 	Engine::get_singleton()->add_singleton(Engine::Singleton("NavigationServer3D", NavigationServer3D::get_singleton(), "NavigationServer3D"));
 	Engine::get_singleton()->add_singleton(Engine::Singleton("RenderingServer", RenderingServer::get_singleton(), "RenderingServer"));
 
+#ifndef PHYSICS_2D_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer2D", PhysicsServer2D::get_singleton(), "PhysicsServer2D"));
-#ifndef _3D_DISABLED
+#endif // PHYSICS_2D_DISABLED
+#ifndef PHYSICS_3D_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer3D", PhysicsServer3D::get_singleton(), "PhysicsServer3D"));
+#endif // PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("XRServer", XRServer::get_singleton(), "XRServer"));
 #endif // _3D_DISABLED
 
