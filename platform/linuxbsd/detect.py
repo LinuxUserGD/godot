@@ -1,8 +1,8 @@
+import distro
 import os
 import platform
 import sys
 from typing import TYPE_CHECKING
-
 from methods import get_compiler_version, print_error, print_info, print_warning, using_gcc
 from platform_methods import detect_arch, validate_arch
 
@@ -499,8 +499,8 @@ def configure(env: "SConsEnvironment"):
     # Link those statically for portability
     if env["use_static_cpp"]:
         env.Append(LINKFLAGS=["-static-libgcc", "-static-libstdc++"])
-        if env["use_llvm"] and platform.system() != "FreeBSD":
+        if env["use_llvm"] and platform.system() != "FreeBSD" and distro.id() != "gentoo":
             env["LINKCOM"] = env["LINKCOM"] + " -l:libatomic.a"
     else:
-        if env["use_llvm"] and platform.system() != "FreeBSD":
+        if env["use_llvm"] and platform.system() != "FreeBSD" and distro.id() != "gentoo":
             env.Append(LIBS=["atomic"])
