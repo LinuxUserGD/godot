@@ -28,15 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_GENERIC_6DOF_JOINT_3D_H
-#define JOLT_GENERIC_6DOF_JOINT_3D_H
+#pragma once
 
 #include "../jolt_physics_server_3d.h"
 #include "jolt_joint_3d.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Constraints/SixDOFConstraint.h"
+#include <Jolt/Physics/Constraints/SixDOFConstraint.h>
 
 class JoltGeneric6DOFJoint3D final : public JoltJoint3D {
 	typedef Vector3::Axis Axis;
@@ -123,5 +122,3 @@ public:
 
 	virtual void rebuild() override;
 };
-
-#endif // JOLT_GENERIC_6DOF_JOINT_3D_H

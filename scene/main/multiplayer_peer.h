@@ -28,13 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef MULTIPLAYER_PEER_H
-#define MULTIPLAYER_PEER_H
+#pragma once
 
+#include "core/extension/ext_wrappers.gen.h"
 #include "core/io/packet_peer.h"
-
-#include "core/extension/ext_wrappers.gen.inc"
-#include "core/object/gdvirtual.gen.inc"
+#include "core/object/gdvirtual.gen.h"
 #include "core/variant/native_ptr.h"
 
 class MultiplayerPeer : public PacketPeer {
@@ -93,8 +91,6 @@ public:
 	virtual ConnectionStatus get_connection_status() const = 0;
 
 	uint32_t generate_unique_id() const;
-
-	MultiplayerPeer() {}
 };
 
 VARIANT_ENUM_CAST(MultiplayerPeer::ConnectionStatus);
@@ -146,5 +142,3 @@ public:
 	EXBIND0RC(int, get_unique_id);
 	EXBIND0RC(ConnectionStatus, get_connection_status);
 };
-
-#endif // MULTIPLAYER_PEER_H

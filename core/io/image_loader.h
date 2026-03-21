@@ -28,17 +28,15 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef IMAGE_LOADER_H
-#define IMAGE_LOADER_H
+#pragma once
 
-#include "core/core_bind.h"
 #include "core/io/file_access.h"
 #include "core/io/image.h"
 #include "core/io/resource_loader.h"
-#include "core/object/gdvirtual.gen.inc"
+#include "core/object/gdvirtual.gen.h"
 #include "core/string/ustring.h"
 #include "core/templates/list.h"
-#include "core/variant/binder_common.h"
+#include "core/variant/type_info.h"
 
 class ImageLoader;
 
@@ -86,7 +84,7 @@ public:
 };
 
 class ImageLoader {
-	static Vector<Ref<ImageFormatLoader>> loader;
+	static inline Vector<Ref<ImageFormatLoader>> loader;
 	friend class ResourceFormatLoaderImage;
 
 protected:
@@ -102,11 +100,11 @@ public:
 };
 
 class ResourceFormatLoaderImage : public ResourceFormatLoader {
+	GDSOFTCLASS(ResourceFormatLoaderImage, ResourceFormatLoader);
+
 public:
 	virtual Ref<Resource> load(const String &p_path, const String &p_original_path = "", Error *r_error = nullptr, bool p_use_sub_threads = false, float *r_progress = nullptr, CacheMode p_cache_mode = CACHE_MODE_REUSE) override;
 	virtual void get_recognized_extensions(List<String> *p_extensions) const override;
 	virtual bool handles_type(const String &p_type) const override;
 	virtual String get_resource_type(const String &p_path) const override;
 };
-
-#endif // IMAGE_LOADER_H

@@ -28,11 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GPU_PARTICLES_COLLISION_3D_H
-#define GPU_PARTICLES_COLLISION_3D_H
+#pragma once
 
 #include "core/templates/local_vector.h"
 #include "scene/3d/visual_instance_3d.h"
+
+class Mesh;
 
 class GPUParticlesCollision3D : public VisualInstance3D {
 	GDCLASS(GPUParticlesCollision3D, VisualInstance3D);
@@ -44,7 +45,7 @@ protected:
 	_FORCE_INLINE_ RID _get_collision() { return collision; }
 	static void _bind_methods();
 
-	GPUParticlesCollision3D(RS::ParticlesCollisionType p_type);
+	GPUParticlesCollision3D(RSE::ParticlesCollisionType p_type);
 
 public:
 	void set_cull_mask(uint32_t p_cull_mask);
@@ -281,7 +282,7 @@ protected:
 	_FORCE_INLINE_ RID _get_collision() { return collision; }
 	static void _bind_methods();
 
-	GPUParticlesAttractor3D(RS::ParticlesCollisionType p_type);
+	GPUParticlesAttractor3D(RSE::ParticlesCollisionType p_type);
 
 public:
 	void set_cull_mask(uint32_t p_cull_mask);
@@ -364,5 +365,3 @@ public:
 	GPUParticlesAttractorVectorField3D();
 	~GPUParticlesAttractorVectorField3D();
 };
-
-#endif // GPU_PARTICLES_COLLISION_3D_H

@@ -28,20 +28,19 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_MOTION_FILTER_3D_H
-#define JOLT_MOTION_FILTER_3D_H
+#pragma once
 
 #include "core/object/object_id.h"
 #include "core/templates/hash_set.h"
 #include "core/templates/rid.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Body/Body.h"
-#include "Jolt/Physics/Body/BodyFilter.h"
-#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h"
-#include "Jolt/Physics/Collision/ObjectLayer.h"
-#include "Jolt/Physics/Collision/ShapeFilter.h"
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyFilter.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/ShapeFilter.h>
 
 class JoltBody3D;
 class JoltPhysicsServer3D;
@@ -68,5 +67,3 @@ public:
 	virtual bool ShouldCollide(const JPH::Shape *p_jolt_shape, const JPH::SubShapeID &p_jolt_shape_id) const override;
 	virtual bool ShouldCollide(const JPH::Shape *p_jolt_shape_self, const JPH::SubShapeID &p_jolt_shape_id_self, const JPH::Shape *p_jolt_shape_other, const JPH::SubShapeID &p_jolt_shape_id_other) const override;
 };
-
-#endif // JOLT_MOTION_FILTER_3D_H

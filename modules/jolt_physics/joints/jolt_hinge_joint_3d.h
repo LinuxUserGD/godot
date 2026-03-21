@@ -28,15 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_HINGE_JOINT_3D_H
-#define JOLT_HINGE_JOINT_3D_H
+#pragma once
 
 #include "../jolt_physics_server_3d.h"
 #include "jolt_joint_3d.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Constraints/SliderConstraint.h"
+#include <Jolt/Physics/Constraints/SliderConstraint.h>
 
 class JoltHingeJoint3D final : public JoltJoint3D {
 	typedef PhysicsServer3D::HingeJointParam Parameter;
@@ -96,5 +95,3 @@ public:
 
 	virtual void rebuild() override;
 };
-
-#endif // JOLT_HINGE_JOINT_3D_H

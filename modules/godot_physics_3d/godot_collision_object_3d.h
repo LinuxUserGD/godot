@@ -28,14 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GODOT_COLLISION_OBJECT_3D_H
-#define GODOT_COLLISION_OBJECT_3D_H
+#pragma once
 
 #include "godot_broad_phase_3d.h"
 #include "godot_shape_3d.h"
 
 #include "core/templates/self_list.h"
-#include "servers/physics_server_3d.h"
 
 #ifdef DEBUG_ENABLED
 #define MAX_OBJECT_DISTANCE 3.1622776601683791e+18
@@ -190,5 +188,3 @@ public:
 
 	virtual ~GodotCollisionObject3D() {}
 };
-
-#endif // GODOT_COLLISION_OBJECT_3D_H

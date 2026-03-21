@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef SAFE_REFCOUNT_H
-#define SAFE_REFCOUNT_H
+#pragma once
 
 #include "core/typedefs.h"
 
@@ -38,7 +37,7 @@
 #endif
 
 #include <atomic>
-#include <type_traits>
+#include <type_traits> // IWYU pragma: keep // Used in macro.
 
 // Design goals for these classes:
 // - No automatic conversions or arithmetic operators,
@@ -51,11 +50,11 @@
 //   even with threads that are already running.
 
 // These are used in very specific areas of the engine where it's critical that these guarantees are held
-#define SAFE_NUMERIC_TYPE_PUN_GUARANTEES(m_type)                    \
-	static_assert(sizeof(SafeNumeric<m_type>) == sizeof(m_type));   \
+#define SAFE_NUMERIC_TYPE_PUN_GUARANTEES(m_type) \
+	static_assert(sizeof(SafeNumeric<m_type>) == sizeof(m_type)); \
 	static_assert(alignof(SafeNumeric<m_type>) == alignof(m_type)); \
 	static_assert(std::is_trivially_destructible_v<std::atomic<m_type>>);
-#define SAFE_FLAG_TYPE_PUN_GUARANTEES                \
+#define SAFE_FLAG_TYPE_PUN_GUARANTEES \
 	static_assert(sizeof(SafeFlag) == sizeof(bool)); \
 	static_assert(alignof(SafeFlag) == alignof(bool));
 
@@ -222,5 +221,3 @@ public:
 		count.set(p_value);
 	}
 };
-
-#endif // SAFE_REFCOUNT_H

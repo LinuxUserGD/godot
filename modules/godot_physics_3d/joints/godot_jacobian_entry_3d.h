@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GODOT_JACOBIAN_ENTRY_3D_H
-#define GODOT_JACOBIAN_ENTRY_3D_H
+#pragma once
 
 /*
 Adapted to Godot from the Bullet library.
@@ -50,7 +49,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "core/math/transform_3d.h"
+#include "core/math/basis.h"
+#include "core/math/vector3.h"
 
 class GodotJacobianEntry3D {
 public:
@@ -165,5 +165,3 @@ public:
 	//Optimization: can be stored in the w/last component of one of the vectors
 	real_t m_Adiag = 1.0;
 };
-
-#endif // GODOT_JACOBIAN_ENTRY_3D_H

@@ -30,6 +30,7 @@
 
 #include "callable.h"
 
+#include "core/object/message_queue.h"
 #include "core/object/object.h"
 #include "core/object/ref_counted.h"
 #include "core/object/script_language.h"
@@ -188,7 +189,7 @@ int Callable::get_argument_count(bool *r_is_valid) const {
 	if (is_custom()) {
 		bool valid = false;
 		return custom->get_argument_count(r_is_valid ? *r_is_valid : valid);
-	} else if (!is_null()) {
+	} else if (is_valid()) {
 		return get_object()->get_method_argument_count(method, r_is_valid);
 	} else {
 		if (r_is_valid) {
@@ -305,7 +306,7 @@ bool Callable::operator<(const Callable &p_callable) const {
 			if (less_a == less_b) {
 				return less_a(custom, p_callable.custom);
 			} else {
-				return less_a < less_b; //it's something..
+				return (uintptr_t)less_a < (uintptr_t)less_b; //it's something..
 			}
 
 		} else {

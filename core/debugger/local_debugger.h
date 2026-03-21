@@ -28,11 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef LOCAL_DEBUGGER_H
-#define LOCAL_DEBUGGER_H
+#pragma once
 
 #include "core/debugger/engine_debugger.h"
-#include "core/object/script_language.h"
 #include "core/templates/list.h"
 
 class LocalDebugger : public EngineDebugger {
@@ -55,5 +53,3 @@ public:
 	LocalDebugger();
 	~LocalDebugger();
 };
-
-#endif // LOCAL_DEBUGGER_H

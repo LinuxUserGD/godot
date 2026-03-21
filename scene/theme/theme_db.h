@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef THEME_DB_H
-#define THEME_DB_H
+#pragma once
 
 #include "core/object/ref_counted.h"
 #include "scene/resources/theme.h"
@@ -45,28 +44,28 @@ class ThemeContext;
 // Macros for binding theme items of this class. This information is used for the documentation, theme
 // overrides, etc. This is also the basis for theme cache.
 
-#define BIND_THEME_ITEM(m_data_type, m_class, m_prop)                                                       \
-	ThemeDB::get_singleton()->bind_class_item(m_data_type, get_class_static(), #m_prop, #m_prop,            \
-			[](Node *p_instance, const StringName &p_item_name, const StringName &p_type_name) {            \
-				m_class *p_cast = Object::cast_to<m_class>(p_instance);                                     \
+#define BIND_THEME_ITEM(m_data_type, m_class, m_prop) \
+	ThemeDB::get_singleton()->bind_class_item(m_data_type, get_class_static(), #m_prop, #m_prop, \
+			[](Node *p_instance, const StringName &p_item_name, const StringName &p_type_name) { \
+				m_class *p_cast = Object::cast_to<m_class>(p_instance); \
 				p_cast->theme_cache.m_prop = p_cast->get_theme_item(m_data_type, p_item_name, p_type_name); \
 			})
 
-#define BIND_THEME_ITEM_CUSTOM(m_data_type, m_class, m_prop, m_item_name)                                   \
-	ThemeDB::get_singleton()->bind_class_item(m_data_type, get_class_static(), #m_prop, m_item_name,        \
-			[](Node *p_instance, const StringName &p_item_name, const StringName &p_type_name) {            \
-				m_class *p_cast = Object::cast_to<m_class>(p_instance);                                     \
+#define BIND_THEME_ITEM_CUSTOM(m_data_type, m_class, m_prop, m_item_name) \
+	ThemeDB::get_singleton()->bind_class_item(m_data_type, get_class_static(), #m_prop, m_item_name, \
+			[](Node *p_instance, const StringName &p_item_name, const StringName &p_type_name) { \
+				m_class *p_cast = Object::cast_to<m_class>(p_instance); \
 				p_cast->theme_cache.m_prop = p_cast->get_theme_item(m_data_type, p_item_name, p_type_name); \
 			})
 
 // Macro for binding theme items used by this class, but defined/binded by other classes. This is primarily used for
 // the theme cache. Can also be used to list such items in documentation.
 
-#define BIND_THEME_ITEM_EXT(m_data_type, m_class, m_prop, m_item_name, m_type_name)                                        \
+#define BIND_THEME_ITEM_EXT(m_data_type, m_class, m_prop, m_item_name, m_type_name) \
 	ThemeDB::get_singleton()->bind_class_external_item(m_data_type, get_class_static(), #m_prop, m_item_name, m_type_name, \
-			[](Node *p_instance, const StringName &p_item_name, const StringName &p_type_name) {                           \
-				m_class *p_cast = Object::cast_to<m_class>(p_instance);                                                    \
-				p_cast->theme_cache.m_prop = p_cast->get_theme_item(m_data_type, p_item_name, p_type_name);                \
+			[](Node *p_instance, const StringName &p_item_name, const StringName &p_type_name) { \
+				m_class *p_cast = Object::cast_to<m_class>(p_instance); \
+				p_cast->theme_cache.m_prop = p_cast->get_theme_item(m_data_type, p_item_name, p_type_name); \
 			})
 
 class ThemeDB : public Object {
@@ -205,5 +204,3 @@ public:
 	const Vector<Ref<Theme>> get_themes() const;
 	Ref<Theme> get_fallback_theme() const;
 };
-
-#endif // THEME_DB_H

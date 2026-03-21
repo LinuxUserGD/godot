@@ -28,10 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef SCRIPT_INSTANCE_H
-#define SCRIPT_INSTANCE_H
+#pragma once
 
-#include "core/object/ref_counted.h"
+#include "core/variant/variant.h"
 
 class Script;
 class ScriptLanguage;
@@ -94,7 +93,5 @@ public:
 	virtual const Variant get_rpc_config() const;
 
 	virtual ScriptLanguage *get_language() = 0;
-	virtual ~ScriptInstance();
+	virtual ~ScriptInstance() {}
 };
-
-#endif // SCRIPT_INSTANCE_H

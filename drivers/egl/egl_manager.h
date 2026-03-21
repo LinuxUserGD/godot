@@ -28,16 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef EGL_MANAGER_H
-#define EGL_MANAGER_H
+#pragma once
 
 #ifdef EGL_ENABLED
 
-// These must come first to avoid windows.h mess.
-#include "platform_gl.h"
-
 #include "core/templates/local_vector.h"
-#include "servers/display_server.h"
+#include "servers/display/display_server_enums.h"
+
+#include <platform_gl.h>
 
 class EGLManager {
 private:
@@ -96,21 +94,21 @@ public:
 	int display_get_native_visual_id(void *p_display);
 
 	Error open_display(void *p_display);
-	Error window_create(DisplayServer::WindowID p_window_id, void *p_display, void *p_native_window, int p_width, int p_height);
+	Error window_create(DisplayServerEnums::WindowID p_window_id, void *p_display, void *p_native_window, int p_width, int p_height);
 
-	void window_destroy(DisplayServer::WindowID p_window_id);
+	void window_destroy(DisplayServerEnums::WindowID p_window_id);
 
 	void release_current();
 	void swap_buffers();
 
-	void window_make_current(DisplayServer::WindowID p_window_id);
+	void window_make_current(DisplayServerEnums::WindowID p_window_id);
 
 	void set_use_vsync(bool p_use);
 	bool is_using_vsync() const;
 
-	EGLContext get_context(DisplayServer::WindowID p_window_id);
-	EGLDisplay get_display(DisplayServer::WindowID p_window_id);
-	EGLConfig get_config(DisplayServer::WindowID p_window_id);
+	EGLContext get_context(DisplayServerEnums::WindowID p_window_id);
+	EGLDisplay get_display(DisplayServerEnums::WindowID p_window_id);
+	EGLConfig get_config(DisplayServerEnums::WindowID p_window_id);
 
 	Error initialize(void *p_native_display = nullptr);
 
@@ -119,5 +117,3 @@ public:
 };
 
 #endif // EGL_ENABLED
-
-#endif // EGL_MANAGER_H

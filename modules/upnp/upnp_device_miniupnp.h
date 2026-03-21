@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef UPNP_DEVICE_MINIUPNP_H
-#define UPNP_DEVICE_MINIUPNP_H
+#pragma once
 
 #ifndef WEB_ENABLED
 
@@ -39,7 +38,7 @@ class UPNPDeviceMiniUPNP : public UPNPDevice {
 	GDCLASS(UPNPDeviceMiniUPNP, UPNPDevice);
 
 private:
-	static UPNPDevice *_create(bool p_notify_postinitialize) { return static_cast<UPNPDevice *>(ClassDB::creator<UPNPDeviceMiniUPNP>(p_notify_postinitialize)); }
+	static UPNPDevice *_create(bool p_notify_postinitialize);
 
 	String description_url;
 	String service_type;
@@ -79,5 +78,3 @@ public:
 };
 
 #endif // WEB_ENABLED
-
-#endif // UPNP_DEVICE_MINIUPNP_H

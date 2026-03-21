@@ -28,11 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef CPU_PARTICLES_3D_H
-#define CPU_PARTICLES_3D_H
+#pragma once
 
 #include "scene/3d/visual_instance_3d.h"
+#include "scene/resources/curve.h"
+#include "scene/resources/gradient.h"
 
+class Mesh;
 class RandomNumberGenerator;
 
 class CPUParticles3D : public GeometryInstance3D {
@@ -178,7 +180,6 @@ private:
 	Vector<Vector3> emission_points;
 	Vector<Vector3> emission_normals;
 	Vector<Color> emission_colors;
-	int emission_point_count = 0;
 	Vector3 emission_ring_axis;
 	real_t emission_ring_height = 0.0;
 	real_t emission_ring_radius = 0.0;
@@ -345,5 +346,3 @@ VARIANT_ENUM_CAST(CPUParticles3D::DrawOrder)
 VARIANT_ENUM_CAST(CPUParticles3D::Parameter)
 VARIANT_ENUM_CAST(CPUParticles3D::ParticleFlags)
 VARIANT_ENUM_CAST(CPUParticles3D::EmissionShape)
-
-#endif // CPU_PARTICLES_3D_H

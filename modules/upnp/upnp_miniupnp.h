@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef UPNP_MINIUPNP_H
-#define UPNP_MINIUPNP_H
+#pragma once
 
 #ifndef WEB_ENABLED
 
@@ -41,7 +40,7 @@ class UPNPMiniUPNP : public UPNP {
 	GDCLASS(UPNPMiniUPNP, UPNP);
 
 private:
-	static UPNP *_create(bool p_notify_postinitialize) { return static_cast<UPNP *>(ClassDB::creator<UPNPMiniUPNP>(p_notify_postinitialize)); }
+	static UPNP *_create(bool p_notify_postinitialize);
 
 	String discover_multicast_if = "";
 	int discover_local_port = 0;
@@ -89,5 +88,3 @@ public:
 };
 
 #endif // WEB_ENABLED
-
-#endif // UPNP_MINIUPNP_H

@@ -28,12 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef TEST_CSG_H
-#define TEST_CSG_H
+#pragma once
 
-#include "../csg.h"
 #include "../csg_shape.h"
 
+#include "scene/main/scene_tree.h"
+#include "scene/main/window.h"
 #include "tests/test_macros.h"
 
 namespace TestCSG {
@@ -110,5 +110,3 @@ TEST_CASE("[SceneTree][CSG] CSGPolygon3D") {
 }
 
 } // namespace TestCSG
-
-#endif // TEST_CSG_H

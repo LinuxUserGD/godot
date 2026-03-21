@@ -28,14 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef AUDIO_DRIVER_DUMMY_H
-#define AUDIO_DRIVER_DUMMY_H
-
-#include "servers/audio_server.h"
+#pragma once
 
 #include "core/os/mutex.h"
 #include "core/os/thread.h"
 #include "core/templates/safe_refcount.h"
+#include "servers/audio/audio_server.h"
 
 class AudioDriverDummy : public AudioDriver {
 	Thread thread;
@@ -85,5 +83,3 @@ public:
 	AudioDriverDummy();
 	~AudioDriverDummy() {}
 };
-
-#endif // AUDIO_DRIVER_DUMMY_H

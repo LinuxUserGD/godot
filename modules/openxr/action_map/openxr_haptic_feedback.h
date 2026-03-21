@@ -28,10 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef OPENXR_HAPTIC_FEEDBACK_H
-#define OPENXR_HAPTIC_FEEDBACK_H
+#pragma once
 
 #include "core/io/resource.h"
+
 #include <openxr/openxr.h>
 
 class OpenXRHapticBase : public Resource {
@@ -68,5 +68,3 @@ public:
 
 	OpenXRHapticVibration();
 };
-
-#endif // OPENXR_HAPTIC_FEEDBACK_H

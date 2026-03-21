@@ -28,11 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef DYNAMIC_FONT_IMPORT_SETTINGS_H
-#define DYNAMIC_FONT_IMPORT_SETTINGS_H
+#pragma once
 
 #include "core/io/resource_importer.h"
-
 #include "scene/gui/dialogs.h"
 #include "scene/gui/tab_container.h"
 #include "scene/gui/text_edit.h"
@@ -172,5 +170,3 @@ public:
 
 	DynamicFontImportSettingsDialog();
 };
-
-#endif // DYNAMIC_FONT_IMPORT_SETTINGS_H

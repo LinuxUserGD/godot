@@ -28,13 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef UNIFORM_SET_CACHE_RD_H
-#define UNIFORM_SET_CACHE_RD_H
+#pragma once
 
 #include "core/templates/local_vector.h"
 #include "core/templates/paged_allocator.h"
 #include "servers/rendering/rendering_device.h"
-#include "servers/rendering/rendering_device_binds.h"
 
 class UniformSetCacheRD : public Object {
 	GDCLASS(UniformSetCacheRD, Object)
@@ -108,16 +106,6 @@ class UniformSetCacheRD : public Object {
 		return _compare_args(idx + 1, uniforms, args...);
 	}
 
-	_FORCE_INLINE_ void _create_args(Vector<RD::Uniform> &uniforms, const RD::Uniform &arg) {
-		uniforms.push_back(arg);
-	}
-
-	template <typename... Args>
-	_FORCE_INLINE_ void _create_args(Vector<RD::Uniform> &uniforms, const RD::Uniform &arg, Args... args) {
-		uniforms.push_back(arg);
-		_create_args(uniforms, args...);
-	}
-
 	static UniformSetCacheRD *singleton;
 
 	uint32_t cache_instances_used = 0;
@@ -177,10 +165,7 @@ public:
 
 		// Not in cache, create:
 
-		Vector<RD::Uniform> uniforms;
-		_create_args(uniforms, args...);
-
-		return _allocate_from_uniforms(p_shader, p_set, h, table_idx, uniforms);
+		return _allocate_from_uniforms(p_shader, p_set, h, table_idx, Vector<RD::Uniform>{ args... });
 	}
 
 	template <typename... Args>
@@ -226,5 +211,3 @@ public:
 	UniformSetCacheRD();
 	~UniformSetCacheRD();
 };
-
-#endif // UNIFORM_SET_CACHE_RD_H

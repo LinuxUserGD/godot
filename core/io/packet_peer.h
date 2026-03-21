@@ -28,15 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef PACKET_PEER_H
-#define PACKET_PEER_H
+#pragma once
 
+#include "core/extension/ext_wrappers.gen.h"
 #include "core/io/stream_peer.h"
-#include "core/object/class_db.h"
+#include "core/object/gdvirtual.gen.h"
 #include "core/templates/ring_buffer.h"
-
-#include "core/extension/ext_wrappers.gen.inc"
-#include "core/object/gdvirtual.gen.inc"
 #include "core/variant/native_ptr.h"
 
 class PacketPeer : public RefCounted {
@@ -72,9 +69,6 @@ public:
 
 	void set_encode_buffer_max_size(int p_max_size);
 	int get_encode_buffer_max_size() const;
-
-	PacketPeer() {}
-	~PacketPeer() {}
 };
 
 class PacketPeerExtension : public PacketPeer {
@@ -124,5 +118,3 @@ public:
 	int get_output_buffer_max_size() const;
 	PacketPeerStream();
 };
-
-#endif // PACKET_PEER_H

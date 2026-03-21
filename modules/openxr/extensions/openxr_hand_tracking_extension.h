@@ -28,15 +28,20 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef OPENXR_HAND_TRACKING_EXTENSION_H
-#define OPENXR_HAND_TRACKING_EXTENSION_H
+#pragma once
 
 #include "../util.h"
-#include "core/math/quaternion.h"
 #include "openxr_extension_wrapper.h"
+
+#include "core/math/quaternion.h"
 #include "servers/xr/xr_hand_tracker.h"
 
 class OpenXRHandTrackingExtension : public OpenXRExtensionWrapper {
+	GDCLASS(OpenXRHandTrackingExtension, OpenXRExtensionWrapper);
+
+protected:
+	static void _bind_methods() {}
+
 public:
 	enum HandTrackedHands {
 		OPENXR_TRACKED_LEFT_HAND,
@@ -72,7 +77,7 @@ public:
 	OpenXRHandTrackingExtension();
 	virtual ~OpenXRHandTrackingExtension() override;
 
-	virtual HashMap<String, bool *> get_requested_extensions() override;
+	virtual HashMap<String, bool *> get_requested_extensions(XrVersion p_version) override;
 
 	virtual void on_instance_created(const XrInstance p_instance) override;
 	virtual void on_instance_destroyed() override;
@@ -122,5 +127,3 @@ private:
 	EXT_PROTO_XRRESULT_FUNC1(xrDestroyHandTrackerEXT, (XrHandTrackerEXT), p_handTracker)
 	EXT_PROTO_XRRESULT_FUNC3(xrLocateHandJointsEXT, (XrHandTrackerEXT), p_handTracker, (const XrHandJointsLocateInfoEXT *), p_locateInfo, (XrHandJointLocationsEXT *), p_locations)
 };
-
-#endif // OPENXR_HAND_TRACKING_EXTENSION_H

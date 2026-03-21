@@ -28,12 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GDSCRIPT_DOCGEN_H
-#define GDSCRIPT_DOCGEN_H
+#pragma once
 
 #include "../gdscript_parser.h"
-
-#include "core/doc_data.h"
 
 class GDScriptDocGen {
 	using GDP = GDScriptParser;
@@ -52,5 +49,3 @@ public:
 	static void doctype_from_gdtype(const GDType &p_gdtype, String &r_type, String &r_enum, bool p_is_return = false);
 	static String docvalue_from_expression(const GDP::ExpressionNode *p_expression);
 };
-
-#endif // GDSCRIPT_DOCGEN_H

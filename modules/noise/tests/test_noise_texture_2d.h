@@ -28,11 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef TEST_NOISE_TEXTURE_2D_H
-#define TEST_NOISE_TEXTURE_2D_H
+#pragma once
 
+#include "../fastnoise_lite.h"
 #include "../noise_texture_2d.h"
 
+#include "core/object/callable_mp.h"
+#include "core/object/message_queue.h"
 #include "tests/test_macros.h"
 
 namespace TestNoiseTexture2D {
@@ -266,5 +268,3 @@ TEST_CASE("[NoiseTexture2D][SceneTree] Generating a seamless noise texture") {
 }
 
 } //namespace TestNoiseTexture2D
-
-#endif // TEST_NOISE_TEXTURE_2D_H

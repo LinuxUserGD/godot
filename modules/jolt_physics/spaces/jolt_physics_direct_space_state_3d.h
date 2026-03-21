@@ -28,20 +28,19 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_PHYSICS_DIRECT_SPACE_STATE_3D_H
-#define JOLT_PHYSICS_DIRECT_SPACE_STATE_3D_H
+#pragma once
 
-#include "servers/physics_server_3d.h"
+#include "servers/physics_3d/physics_server_3d.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Body/Body.h"
-#include "Jolt/Physics/Body/BodyFilter.h"
-#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h"
-#include "Jolt/Physics/Collision/ContactListener.h"
-#include "Jolt/Physics/Collision/ObjectLayer.h"
-#include "Jolt/Physics/Collision/Shape/Shape.h"
-#include "Jolt/Physics/Collision/ShapeFilter.h"
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyFilter.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/ContactListener.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/ShapeFilter.h>
 
 class JoltBody3D;
 class JoltShape3D;
@@ -83,5 +82,3 @@ public:
 
 	JoltSpace3D &get_space() const { return *space; }
 };
-
-#endif // JOLT_PHYSICS_DIRECT_SPACE_STATE_3D_H

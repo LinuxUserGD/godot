@@ -28,12 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef POPUP_H
-#define POPUP_H
-
-#include "scene/main/window.h"
+#pragma once
 
 #include "core/templates/local_vector.h"
+#include "scene/main/window.h"
 
 class Panel;
 
@@ -107,5 +105,3 @@ public:
 
 	PopupPanel();
 };
-
-#endif // POPUP_H

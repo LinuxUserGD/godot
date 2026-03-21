@@ -28,10 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef SKELETON_PROFILE_H
-#define SKELETON_PROFILE_H
+#pragma once
 
-#include "texture.h"
+#include "scene/resources/texture.h"
 
 class SkeletonProfile : public Resource {
 	GDCLASS(SkeletonProfile, Resource);
@@ -137,5 +136,3 @@ public:
 };
 
 VARIANT_ENUM_CAST(SkeletonProfile::TailDirection);
-
-#endif // SKELETON_PROFILE_H

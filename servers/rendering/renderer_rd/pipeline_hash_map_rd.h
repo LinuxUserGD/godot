@@ -28,11 +28,18 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef PIPELINE_HASH_MAP_RD_H
-#define PIPELINE_HASH_MAP_RD_H
+#pragma once
 
+#include "core/object/worker_thread_pool.h"
+#include "core/os/mutex.h"
+#include "core/templates/hash_map.h"
+#include "core/templates/local_vector.h"
+#include "core/templates/rb_map.h"
+#include "core/templates/rb_set.h"
+#include "core/templates/rid.h"
+#include "core/templates/vector.h"
 #include "servers/rendering/rendering_device.h"
-#include "servers/rendering_server.h"
+#include "servers/rendering/rendering_server_enums.h"
 
 #define PRINT_PIPELINE_COMPILATION_KEYS 0
 
@@ -78,9 +85,17 @@ private:
 	}
 
 	void _wait_for_all_pipelines() {
-		MutexLock local_lock(local_mutex);
-		for (KeyValue<uint32_t, WorkerThreadPool::TaskID> key_value : compilation_tasks) {
-			WorkerThreadPool::get_singleton()->wait_for_task_completion(key_value.value);
+		thread_local LocalVector<WorkerThreadPool::TaskID> tasks_to_wait;
+		tasks_to_wait.clear();
+		{
+			MutexLock local_lock(local_mutex);
+			for (KeyValue<uint32_t, WorkerThreadPool::TaskID> key_value : compilation_tasks) {
+				tasks_to_wait.push_back(key_value.value);
+			}
+		}
+
+		for (WorkerThreadPool::TaskID task_id : tasks_to_wait) {
+			WorkerThreadPool::get_singleton()->wait_for_task_completion(task_id);
 		}
 	}
 
@@ -92,7 +107,7 @@ public:
 	}
 
 	// Start compilation of a pipeline ahead of time in the background. Returns true if the compilation was started, false if it wasn't required. Source is only used for collecting statistics.
-	void compile_pipeline(const Key &p_key, uint32_t p_key_hash, RS::PipelineSource p_source, bool p_high_priority) {
+	void compile_pipeline(const Key &p_key, uint32_t p_key_hash, RSE::PipelineSource p_source, bool p_high_priority) {
 		DEV_ASSERT((creation_object != nullptr) && (creation_function != nullptr) && "Creation object and function was not set before attempting to compile a pipeline.");
 
 		MutexLock local_lock(local_mutex);
@@ -112,19 +127,19 @@ public:
 #if PRINT_PIPELINE_COMPILATION_KEYS
 		String source_name = "UNKNOWN";
 		switch (p_source) {
-			case RS::PIPELINE_SOURCE_CANVAS:
+			case RSE::PIPELINE_SOURCE_CANVAS:
 				source_name = "CANVAS";
 				break;
-			case RS::PIPELINE_SOURCE_MESH:
+			case RSE::PIPELINE_SOURCE_MESH:
 				source_name = "MESH";
 				break;
-			case RS::PIPELINE_SOURCE_SURFACE:
+			case RSE::PIPELINE_SOURCE_SURFACE:
 				source_name = "SURFACE";
 				break;
-			case RS::PIPELINE_SOURCE_DRAW:
+			case RSE::PIPELINE_SOURCE_DRAW:
 				source_name = "DRAW";
 				break;
-			case RS::PIPELINE_SOURCE_SPECIALIZATION:
+			case RSE::PIPELINE_SOURCE_SPECIALIZATION:
 				source_name = "SPECIALIZATION";
 				break;
 		}
@@ -138,22 +153,30 @@ public:
 	}
 
 	void wait_for_pipeline(uint32_t p_key_hash) {
-		MutexLock local_lock(local_mutex);
-		if (!compilation_set.has(p_key_hash)) {
-			// The pipeline was never submitted, we can't wait for it.
-			return;
+		WorkerThreadPool::TaskID task_id_to_wait = WorkerThreadPool::INVALID_TASK_ID;
+
+		{
+			MutexLock local_lock(local_mutex);
+			if (!compilation_set.has(p_key_hash)) {
+				// The pipeline was never submitted, we can't wait for it.
+				return;
+			}
+
+			HashMap<uint32_t, WorkerThreadPool::TaskID>::Iterator task_it = compilation_tasks.find(p_key_hash);
+			if (task_it != compilation_tasks.end()) {
+				// Wait for and remove the compilation task if it exists.
+				task_id_to_wait = task_it->value;
+				compilation_tasks.remove(task_it);
+			}
 		}
 
-		HashMap<uint32_t, WorkerThreadPool::TaskID>::Iterator task_it = compilation_tasks.find(p_key_hash);
-		if (task_it != compilation_tasks.end()) {
-			// Wait for and remove the compilation task if it exists.
-			WorkerThreadPool::get_singleton()->wait_for_task_completion(task_it->value);
-			compilation_tasks.remove(task_it);
+		if (task_id_to_wait != WorkerThreadPool::INVALID_TASK_ID) {
+			WorkerThreadPool::get_singleton()->wait_for_task_completion(task_id_to_wait);
 		}
 	}
 
 	// Retrieve a pipeline. It'll return an empty pipeline if it's not available yet, but it'll be guaranteed to succeed if 'wait for compilation' is true and stall as necessary. Source is just an optional number to aid debugging.
-	RID get_pipeline(const Key &p_key, uint32_t p_key_hash, bool p_wait_for_compilation, RS::PipelineSource p_source) {
+	RID get_pipeline(const Key &p_key, uint32_t p_key_hash, bool p_wait_for_compilation, RSE::PipelineSource p_source) {
 		RBMap<uint32_t, RID>::Element *e = hash_map.find(p_key_hash);
 
 		if (e == nullptr) {
@@ -193,7 +216,7 @@ public:
 		_add_new_pipelines_to_map();
 
 		for (KeyValue<uint32_t, RID> entry : hash_map) {
-			RD::get_singleton()->free(entry.value);
+			RD::get_singleton()->free_rid(entry.value);
 		}
 
 		hash_map.clear();
@@ -217,5 +240,3 @@ public:
 		clear_pipelines();
 	}
 };
-
-#endif // PIPELINE_HASH_MAP_RD_H

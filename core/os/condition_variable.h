@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef CONDITION_VARIABLE_H
-#define CONDITION_VARIABLE_H
+#pragma once
 
 #include "core/os/mutex.h"
 #include "core/os/safe_binary_mutex.h"
@@ -38,7 +37,7 @@
 
 #ifdef MINGW_ENABLED
 #define MINGW_STDTHREAD_REDUNDANCY_WARNING
-#include "thirdparty/mingw-std-threads/mingw.condition_variable.h"
+#include <thirdparty/mingw-std-threads/mingw.condition_variable.h>
 #define THREADING_NAMESPACE mingw_stdthread
 #else
 #include <condition_variable>
@@ -85,5 +84,3 @@ public:
 };
 
 #endif // THREADS_ENABLED
-
-#endif // CONDITION_VARIABLE_H

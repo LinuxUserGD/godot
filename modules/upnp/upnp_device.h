@@ -28,10 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef UPNP_DEVICE_H
-#define UPNP_DEVICE_H
+#pragma once
 
 #include "core/object/ref_counted.h"
+#include "core/variant/type_info.h"
 
 class UPNPDevice : public RefCounted {
 	GDCLASS(UPNPDevice, RefCounted);
@@ -90,5 +90,3 @@ public:
 };
 
 VARIANT_ENUM_CAST(UPNPDevice::IGDStatus)
-
-#endif // UPNP_DEVICE_H

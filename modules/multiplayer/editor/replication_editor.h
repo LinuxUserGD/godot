@@ -28,13 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef REPLICATION_EDITOR_H
-#define REPLICATION_EDITOR_H
+#pragma once
 
 #include "../scene_replication_config.h"
 
+#include "editor/docks/editor_dock.h"
 #include "editor/plugins/editor_plugin.h"
-#include "scene/gui/box_container.h"
 
 class ConfirmationDialog;
 class MultiplayerSynchronizer;
@@ -45,8 +44,8 @@ class TreeItem;
 class PropertySelector;
 class SceneTreeDialog;
 
-class ReplicationEditor : public VBoxContainer {
-	GDCLASS(ReplicationEditor, VBoxContainer);
+class ReplicationEditor : public EditorDock {
+	GDCLASS(ReplicationEditor, EditorDock);
 
 private:
 	MultiplayerSynchronizer *current = nullptr;
@@ -102,7 +101,4 @@ public:
 
 	Button *get_pin() { return pin; }
 	ReplicationEditor();
-	~ReplicationEditor() {}
 };
-
-#endif // REPLICATION_EDITOR_H

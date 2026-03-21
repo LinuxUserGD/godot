@@ -28,27 +28,26 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GDSCRIPT_LANGUAGE_PROTOCOL_H
-#define GDSCRIPT_LANGUAGE_PROTOCOL_H
+#pragma once
 
 #include "gdscript_text_document.h"
 #include "gdscript_workspace.h"
+#include "scene_cache.h"
 
 #include "core/io/stream_peer_tcp.h"
 #include "core/io/tcp_server.h"
 
-#include "modules/modules_enabled.gen.h" // For jsonrpc.
-#ifdef MODULE_JSONRPC_ENABLED
 #include "modules/jsonrpc/jsonrpc.h"
-#else
-#error "Can't build GDScript LSP without JSONRPC module."
-#endif
 
 #define LSP_MAX_BUFFER_SIZE 4194304
 #define LSP_MAX_CLIENTS 8
 
+#define LSP_NO_CLIENT -1
+
 class GDScriptLanguageProtocol : public JSONRPC {
 	GDCLASS(GDScriptLanguageProtocol, JSONRPC)
+
+	friend class TestGDScriptLanguageProtocolInitializer;
 
 private:
 	struct LSPeer : RefCounted {
@@ -64,6 +63,24 @@ private:
 
 		Error handle_data();
 		Error send_data();
+
+		/**
+		 * Tracks all files that the client claimed, however for files deemed not relevant
+		 * to the server the `text` might not be persisted.
+		 */
+		HashMap<String, LSP::TextDocumentItem> managed_files;
+		HashMap<String, ExtendGDScriptParser *> parse_results;
+
+		void remove_cached_parser(const String &p_path);
+		ExtendGDScriptParser *parse_script(const String &p_path);
+
+		~LSPeer();
+
+	private:
+		void clear_stale_parsers();
+		// Paths of parsers which we can't cache longterm.
+		// Can be cleared up using `clear_stale_parsers()`.
+		HashSet<String> stale_parsers;
 	};
 
 	enum LSPErrorCode {
@@ -74,8 +91,9 @@ private:
 	static GDScriptLanguageProtocol *singleton;
 
 	HashMap<int, Ref<LSPeer>> clients;
+	SceneCache scene_cache;
 	Ref<TCPServer> server;
-	int latest_client_id = 0;
+	int latest_client_id = LSP_NO_CLIENT;
 	int next_client_id = 0;
 
 	int next_server_id = 0;
@@ -101,6 +119,8 @@ public:
 	_FORCE_INLINE_ static GDScriptLanguageProtocol *get_singleton() { return singleton; }
 	_FORCE_INLINE_ Ref<GDScriptWorkspace> get_workspace() { return workspace; }
 	_FORCE_INLINE_ Ref<GDScriptTextDocument> get_text_document() { return text_document; }
+	_FORCE_INLINE_ SceneCache *get_scene_cache() { return &scene_cache; }
+
 	_FORCE_INLINE_ bool is_initialized() const { return _initialized; }
 
 	void poll(int p_limit_usec);
@@ -113,7 +133,27 @@ public:
 	bool is_smart_resolve_enabled() const;
 	bool is_goto_native_symbols_enabled() const;
 
-	GDScriptLanguageProtocol();
-};
+	// Text Document Synchronization
+	void lsp_did_open(const Dictionary &p_params);
+	void lsp_did_change(const Dictionary &p_params);
+	void lsp_did_close(const Dictionary &p_params);
 
-#endif // GDSCRIPT_LANGUAGE_PROTOCOL_H
+	/**
+	 * Returns a list of symbols that might be related to the document position.
+	 *
+	 * The result fulfills no semantic guarantees, nor is it guaranteed to be complete.
+	 * Should only be used for "smart resolve".
+	 */
+	void resolve_related_symbols(const LSP::TextDocumentPositionParams &p_doc_pos, List<const LSP::DocumentSymbol *> &r_list);
+
+	/**
+	 * Returns parse results for the given path, using the cache if available.
+	 * If no such file exists, or the file is not a GDScript file a `nullptr` is returned.
+	 */
+	ExtendGDScriptParser *get_parse_result(const String &p_path);
+
+	GDScriptLanguageProtocol();
+	~GDScriptLanguageProtocol() {
+		clients.clear();
+	}
+};

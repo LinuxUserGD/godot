@@ -28,17 +28,16 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_CUSTOM_MOTION_SHAPE_H
-#define JOLT_CUSTOM_MOTION_SHAPE_H
+#pragma once
 
 #include "jolt_custom_shape_type.h"
 
 #include "core/error/error_macros.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Collision/Shape/ConvexShape.h"
-#include "Jolt/Physics/Collision/TransformedShape.h"
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/Collision/TransformedShape.h>
 
 class JoltCustomMotionShape final : public JPH::ConvexShape {
 	mutable JPH::ConvexShape::SupportBuffer inner_support_buffer;
@@ -113,5 +112,3 @@ public:
 
 	void set_motion(JPH::Vec3Arg p_motion) { motion = p_motion; }
 };
-
-#endif // JOLT_CUSTOM_MOTION_SHAPE_H

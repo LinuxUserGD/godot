@@ -28,14 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_CUSTOM_RAY_SHAPE_H
-#define JOLT_CUSTOM_RAY_SHAPE_H
+#pragma once
 
 #include "jolt_custom_shape_type.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Collision/Shape/ConvexShape.h"
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
 
 class JoltCustomRayShapeSettings final : public JPH::ConvexShapeSettings {
 public:
@@ -103,5 +102,3 @@ public:
 
 	virtual const JPH::ConvexShape::Support *GetSupportFunction(JPH::ConvexShape::ESupportMode p_mode, JPH::ConvexShape::SupportBuffer &p_buffer, JPH::Vec3Arg p_scale) const override;
 };
-
-#endif // JOLT_CUSTOM_RAY_SHAPE_H

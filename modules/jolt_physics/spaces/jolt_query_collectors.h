@@ -28,17 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_QUERY_COLLECTORS_H
-#define JOLT_QUERY_COLLECTORS_H
+#pragma once
 
-#include "../jolt_project_settings.h"
-#include "jolt_space_3d.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Jolt.h"
-
-#include "Jolt/Core/STLLocalAllocator.h"
-#include "Jolt/Physics/Collision/InternalEdgeRemovingCollector.h"
-#include "Jolt/Physics/Collision/Shape/Shape.h"
+#include <Jolt/Core/STLLocalAllocator.h>
+#include <Jolt/Physics/Collision/InternalEdgeRemovingCollector.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 
 template <typename TBase, int TDefaultCapacity>
 class JoltQueryCollectorAll final : public TBase {
@@ -244,5 +240,3 @@ public:
 		}
 	}
 };
-
-#endif // JOLT_QUERY_COLLECTORS_H

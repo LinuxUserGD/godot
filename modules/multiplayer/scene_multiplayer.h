@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef SCENE_MULTIPLAYER_H
-#define SCENE_MULTIPLAYER_H
+#pragma once
 
 #include "scene_cache_interface.h"
 #include "scene_replication_interface.h"
@@ -183,7 +182,7 @@ public:
 	Error send_bytes(Vector<uint8_t> p_data, int p_to = MultiplayerPeer::TARGET_PEER_BROADCAST, MultiplayerPeer::TransferMode p_mode = MultiplayerPeer::TRANSFER_MODE_RELIABLE, int p_channel = 0);
 	String get_rpc_md5(const Object *p_obj);
 
-	const HashSet<int> get_connected_peers() const { return connected_peers; }
+	const HashSet<int> get_connected_peers() const { return HashSet<int>(connected_peers); }
 
 	void set_remote_sender_override(int p_id) { remote_sender_override = p_id; }
 	void set_refuse_new_connections(bool p_refuse);
@@ -204,5 +203,3 @@ public:
 	SceneMultiplayer();
 	~SceneMultiplayer();
 };
-
-#endif // SCENE_MULTIPLAYER_H

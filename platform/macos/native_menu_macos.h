@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef NATIVE_MENU_MACOS_H
-#define NATIVE_MENU_MACOS_H
+#pragma once
 
 #include "core/templates/hash_map.h"
 #include "core/templates/rid_owner.h"
@@ -89,6 +88,9 @@ public:
 	virtual void free_menu(const RID &p_rid) override;
 
 	NSMenu *get_native_menu_handle(const RID &p_rid);
+
+	virtual String get_system_menu_text(SystemMenus p_menu_id) const override;
+	virtual void set_system_menu_text(SystemMenus p_menu_id, const String &p_name) override;
 
 	virtual Size2 get_size(const RID &p_rid) const override;
 	virtual void popup(const RID &p_rid, const Vector2i &p_position) override;
@@ -150,6 +152,7 @@ public:
 	virtual void set_item_max_states(const RID &p_rid, int p_idx, int p_max_states) override;
 	virtual void set_item_icon(const RID &p_rid, int p_idx, const Ref<Texture2D> &p_icon) override;
 	virtual void set_item_indentation_level(const RID &p_rid, int p_idx, int p_level) override;
+	virtual int set_item_index(const RID &p_rid, int p_idx, int p_target_idx) override;
 
 	virtual int get_item_count(const RID &p_rid) const override;
 	virtual bool is_system_menu(const RID &p_rid) const override;
@@ -160,5 +163,3 @@ public:
 	NativeMenuMacOS();
 	~NativeMenuMacOS();
 };
-
-#endif // NATIVE_MENU_MACOS_H

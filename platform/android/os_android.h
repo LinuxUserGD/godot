@@ -28,14 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef OS_ANDROID_H
-#define OS_ANDROID_H
+#pragma once
 
 #include "audio_driver_opensl.h"
 
 #include "core/os/main_loop.h"
 #include "drivers/unix/os_unix.h"
-#include "servers/audio_server.h"
 
 class GodotJavaWrapper;
 class GodotIOJavaWrapper;
@@ -107,8 +105,6 @@ public:
 
 	virtual void finalize() override;
 
-	typedef int64_t ProcessID;
-
 	static OS_Android *get_singleton();
 	GodotJavaWrapper *get_godot_java();
 	GodotIOJavaWrapper *get_godot_io_java();
@@ -124,6 +120,8 @@ public:
 	virtual String get_name() const override;
 	virtual String get_distribution_name() const override;
 	virtual String get_version() const override;
+	virtual String get_version_alias() const override;
+
 	virtual MainLoop *get_main_loop() const override;
 
 	void main_loop_begin();
@@ -190,7 +188,6 @@ private:
 
 #ifdef TOOLS_ENABLED
 	static void _on_main_screen_changed(const String &p_screen_name);
+	static void _on_distraction_free_mode_changed(bool p_enable);
 #endif
 };
-
-#endif // OS_ANDROID_H

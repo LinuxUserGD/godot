@@ -28,15 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_CONE_TWIST_JOINT_3D_H
-#define JOLT_CONE_TWIST_JOINT_3D_H
+#pragma once
 
 #include "../jolt_physics_server_3d.h"
 #include "jolt_joint_3d.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Body/Body.h"
+#include <Jolt/Physics/Body/Body.h>
 
 class JoltConeTwistJoint3D final : public JoltJoint3D {
 	typedef PhysicsServer3D::ConeTwistJointParam Parameter;
@@ -93,5 +92,3 @@ public:
 
 	virtual void rebuild() override;
 };
-
-#endif // JOLT_CONE_TWIST_JOINT_3D_H

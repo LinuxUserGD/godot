@@ -28,17 +28,16 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_STREAM_WRAPPERS_H
-#define JOLT_STREAM_WRAPPERS_H
+#pragma once
 
 #ifdef DEBUG_ENABLED
 
 #include "core/io/file_access.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Core/StreamIn.h"
-#include "Jolt/Core/StreamOut.h"
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 
 class JoltStreamOutputWrapper final : public JPH::StreamOut {
 	Ref<FileAccess> file_access;
@@ -77,5 +76,3 @@ public:
 };
 
 #endif
-
-#endif // JOLT_STREAM_WRAPPERS_H

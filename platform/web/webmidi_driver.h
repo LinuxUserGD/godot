@@ -28,13 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef WEBMIDI_DRIVER_H
-#define WEBMIDI_DRIVER_H
-
-#include "core/os/midi_driver.h"
+#pragma once
 
 #include "godot_js.h"
-#include "godot_midi.h"
+
+#include "core/os/midi_driver.h"
 
 class MIDIDriverWebMidi : public MIDIDriver {
 private:
@@ -57,5 +55,3 @@ public:
 	WASM_EXPORT static void on_midi_message(int p_device_index, int p_status, const uint8_t *p_data, int p_data_len);
 	static void _on_midi_message(int p_device_index, int p_status, const PackedByteArray &p_data, int p_data_len);
 };
-
-#endif // WEBMIDI_DRIVER_H

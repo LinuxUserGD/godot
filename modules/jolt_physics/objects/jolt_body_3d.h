@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_BODY_3D_H
-#define JOLT_BODY_3D_H
+#pragma once
 
 #include "jolt_physics_direct_body_state_3d.h"
 #include "jolt_shaped_object_3d.h"
@@ -57,6 +56,8 @@ public:
 	};
 
 private:
+	friend class JoltBodyActivationListener3D;
+
 	SelfList<JoltBody3D> call_queries_element;
 
 	LocalVector<RID> exceptions;
@@ -91,7 +92,6 @@ private:
 	float angular_damp = 0.0f;
 	float total_linear_damp = 0.0f;
 	float total_angular_damp = 0.0f;
-	float gravity_scale = 1.0f;
 	float collision_priority = 1.0f;
 
 	int contact_count = 0;
@@ -115,13 +115,14 @@ private:
 	void _dequeue_call_queries();
 
 	void _integrate_forces(float p_step, JPH::Body &p_jolt_body);
-
 	void _move_kinematic(float p_step, JPH::Body &p_jolt_body);
 
 	JPH::EAllowedDOFs _calculate_allowed_dofs() const;
 
 	JPH::MassProperties _calculate_mass_properties(const JPH::Shape &p_shape) const;
 	JPH::MassProperties _calculate_mass_properties() const;
+
+	void _on_wake_up();
 
 	void _update_mass_properties();
 	void _update_gravity(JPH::Body &p_jolt_body);
@@ -274,7 +275,7 @@ public:
 	float get_friction() const;
 	void set_friction(float p_friction);
 
-	float get_gravity_scale() const { return gravity_scale; }
+	float get_gravity_scale() const;
 	void set_gravity_scale(float p_scale);
 
 	Vector3 get_gravity() const { return gravity; }
@@ -305,5 +306,3 @@ public:
 	virtual bool can_interact_with(const JoltSoftBody3D &p_other) const override;
 	virtual bool can_interact_with(const JoltArea3D &p_other) const override;
 };
-
-#endif // JOLT_BODY_3D_H

@@ -28,13 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef TEST_REGEX_H
-#define TEST_REGEX_H
+#pragma once
 
 #include "../regex.h"
 
 #include "core/string/ustring.h"
-
 #include "tests/test_macros.h"
 
 namespace TestRegEx {
@@ -423,5 +421,3 @@ TEST_CASE("[RegEx] Lookbehind groups empty matches") {
 }
 
 } // namespace TestRegEx
-
-#endif // TEST_REGEX_H

@@ -28,16 +28,17 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GDEXTENSION_LIBRARY_LOADER_H
-#define GDEXTENSION_LIBRARY_LOADER_H
-
-#include <functional>
+#pragma once
 
 #include "core/extension/gdextension_loader.h"
 #include "core/io/config_file.h"
 #include "core/os/shared_object.h"
 
+#include <functional>
+
 class GDExtensionLibraryLoader : public GDExtensionLoader {
+	GDSOFTCLASS(GDExtensionLibraryLoader, GDExtensionLoader);
+
 	friend class GDExtensionManager;
 	friend class GDExtension;
 
@@ -47,8 +48,6 @@ private:
 	void *library = nullptr; // pointer if valid.
 	String library_path;
 	String entry_symbol;
-
-	bool is_static_library = false;
 
 #ifdef TOOLS_ENABLED
 	bool is_reloadable = false;
@@ -81,5 +80,3 @@ public:
 
 	Error parse_gdextension_file(const String &p_path);
 };
-
-#endif // GDEXTENSION_LIBRARY_LOADER_H

@@ -28,10 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GODOT_SHAPE_2D_H
-#define GODOT_SHAPE_2D_H
+#pragma once
 
-#include "servers/physics_server_2d.h"
+#include "servers/physics_2d/physics_server_2d.h"
 
 class GodotShape2D;
 
@@ -129,19 +128,19 @@ public:
 };
 
 //let the optimizer do the magic
-#define DEFAULT_PROJECT_RANGE_CAST                                                                                                                                  \
+#define DEFAULT_PROJECT_RANGE_CAST \
 	virtual void project_range_castv(const Vector2 &p_cast, const Vector2 &p_normal, const Transform2D &p_transform, real_t &r_min, real_t &r_max) const override { \
-		project_range_cast(p_cast, p_normal, p_transform, r_min, r_max);                                                                                            \
-	}                                                                                                                                                               \
-	_FORCE_INLINE_ void project_range_cast(const Vector2 &p_cast, const Vector2 &p_normal, const Transform2D &p_transform, real_t &r_min, real_t &r_max) const {    \
-		real_t mina, maxa;                                                                                                                                          \
-		real_t minb, maxb;                                                                                                                                          \
-		Transform2D ofsb = p_transform;                                                                                                                             \
-		ofsb.columns[2] += p_cast;                                                                                                                                  \
-		project_range(p_normal, p_transform, mina, maxa);                                                                                                           \
-		project_range(p_normal, ofsb, minb, maxb);                                                                                                                  \
-		r_min = MIN(mina, minb);                                                                                                                                    \
-		r_max = MAX(maxa, maxb);                                                                                                                                    \
+		project_range_cast(p_cast, p_normal, p_transform, r_min, r_max); \
+	} \
+	_FORCE_INLINE_ void project_range_cast(const Vector2 &p_cast, const Vector2 &p_normal, const Transform2D &p_transform, real_t &r_min, real_t &r_max) const { \
+		real_t mina, maxa; \
+		real_t minb, maxb; \
+		Transform2D ofsb = p_transform; \
+		ofsb.columns[2] += p_cast; \
+		project_range(p_normal, p_transform, mina, maxa); \
+		project_range(p_normal, ofsb, minb, maxb); \
+		r_min = MIN(mina, minb); \
+		r_max = MAX(maxa, maxb); \
 	}
 
 class GodotWorldBoundaryShape2D : public GodotShape2D {
@@ -535,5 +534,3 @@ public:
 };
 
 #undef DEFAULT_PROJECT_RANGE_CAST
-
-#endif // GODOT_SHAPE_2D_H

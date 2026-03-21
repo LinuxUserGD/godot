@@ -28,14 +28,17 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef HTTP_CLIENT_TCP_H
-#define HTTP_CLIENT_TCP_H
-
-#include "http_client.h"
+#pragma once
 
 #include "core/crypto/crypto.h"
+#include "core/io/http_client.h"
+#include "core/io/ip.h"
+
+class StreamPeerTCP;
 
 class HTTPClientTCP : public HTTPClient {
+	GDSOFTCLASS(HTTPClientTCP, HTTPClient);
+
 private:
 	Status status = STATUS_DISCONNECTED;
 	IP::ResolverID resolving = IP::RESOLVER_INVALID_ID;
@@ -100,5 +103,3 @@ public:
 	void set_https_proxy(const String &p_host, int p_port) override;
 	HTTPClientTCP();
 };
-
-#endif // HTTP_CLIENT_TCP_H

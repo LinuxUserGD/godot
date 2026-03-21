@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GPU_PARTICLES_2D_H
-#define GPU_PARTICLES_2D_H
+#pragma once
 
 #include "scene/2d/node_2d.h"
 
@@ -69,7 +68,7 @@ private:
 	uint32_t seed = 0;
 	bool use_fixed_seed = false;
 #ifdef TOOLS_ENABLED
-	bool show_visibility_rect = false;
+	bool show_gizmos = false;
 #endif
 	Ref<Material> process_material;
 
@@ -101,6 +100,9 @@ protected:
 	static void _bind_methods();
 	void _validate_property(PropertyInfo &p_property) const;
 	void _notification(int p_what);
+#ifdef TOOLS_ENABLED
+	void _draw_emission_gizmo();
+#endif
 	void _update_collision_size();
 
 #ifndef DISABLE_DEPRECATED
@@ -129,7 +131,7 @@ public:
 	void request_particles_process(real_t p_requested_process_time);
 
 #ifdef TOOLS_ENABLED
-	void set_show_visibility_rect(bool p_show_visibility_rect);
+	void set_show_gizmos(bool p_show_gizmos);
 #endif
 
 	bool is_emitting() const;
@@ -181,11 +183,11 @@ public:
 	uint32_t get_seed() const;
 
 	enum EmitFlags {
-		EMIT_FLAG_POSITION = RS::PARTICLES_EMIT_FLAG_POSITION,
-		EMIT_FLAG_ROTATION_SCALE = RS::PARTICLES_EMIT_FLAG_ROTATION_SCALE,
-		EMIT_FLAG_VELOCITY = RS::PARTICLES_EMIT_FLAG_VELOCITY,
-		EMIT_FLAG_COLOR = RS::PARTICLES_EMIT_FLAG_COLOR,
-		EMIT_FLAG_CUSTOM = RS::PARTICLES_EMIT_FLAG_CUSTOM
+		EMIT_FLAG_POSITION = RSE::PARTICLES_EMIT_FLAG_POSITION,
+		EMIT_FLAG_ROTATION_SCALE = RSE::PARTICLES_EMIT_FLAG_ROTATION_SCALE,
+		EMIT_FLAG_VELOCITY = RSE::PARTICLES_EMIT_FLAG_VELOCITY,
+		EMIT_FLAG_COLOR = RSE::PARTICLES_EMIT_FLAG_COLOR,
+		EMIT_FLAG_CUSTOM = RSE::PARTICLES_EMIT_FLAG_CUSTOM
 	};
 
 	void emit_particle(const Transform2D &p_transform, const Vector2 &p_velocity, const Color &p_color, const Color &p_custom, uint32_t p_emit_flags);
@@ -200,5 +202,3 @@ public:
 
 VARIANT_ENUM_CAST(GPUParticles2D::DrawOrder)
 VARIANT_ENUM_CAST(GPUParticles2D::EmitFlags)
-
-#endif // GPU_PARTICLES_2D_H

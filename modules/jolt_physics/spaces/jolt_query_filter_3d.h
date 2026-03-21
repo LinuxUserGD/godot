@@ -28,18 +28,17 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOLT_QUERY_FILTER_3D_H
-#define JOLT_QUERY_FILTER_3D_H
+#pragma once
 
 #include "core/templates/hash_set.h"
 #include "core/templates/rid.h"
 
-#include "Jolt/Jolt.h"
+#include <Jolt/Jolt.h>
 
-#include "Jolt/Physics/Body/Body.h"
-#include "Jolt/Physics/Body/BodyFilter.h"
-#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h"
-#include "Jolt/Physics/Collision/ObjectLayer.h"
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyFilter.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
 
 class JoltPhysicsDirectSpaceState3D;
 class JoltSpace3D;
@@ -63,5 +62,3 @@ public:
 	virtual bool ShouldCollide(const JPH::BodyID &p_body_id) const override;
 	virtual bool ShouldCollideLocked(const JPH::Body &p_body) const override;
 };
-
-#endif // JOLT_QUERY_FILTER_3D_H

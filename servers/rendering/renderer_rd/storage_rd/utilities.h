@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef UTILITIES_RD_H
-#define UTILITIES_RD_H
+#pragma once
 
 #include "core/templates/rid_owner.h"
 #include "servers/rendering/storage/utilities.h"
@@ -68,7 +67,7 @@ public:
 
 	/* INSTANCES */
 
-	virtual RS::InstanceType get_base_type(RID p_rid) const override;
+	virtual RSE::InstanceType get_base_type(RID p_rid) const override;
 	virtual bool free(RID p_rid) override;
 
 	/* DEPENDENCIES */
@@ -109,11 +108,11 @@ public:
 
 	virtual void update_memory_info() override;
 
-	virtual uint64_t get_rendering_info(RS::RenderingInfo p_info) override;
+	virtual uint64_t get_rendering_info(RSE::RenderingInfo p_info) override;
 
 	virtual String get_video_adapter_name() const override;
 	virtual String get_video_adapter_vendor() const override;
-	virtual RenderingDevice::DeviceType get_video_adapter_type() const override;
+	virtual RenderingDeviceEnums::DeviceType get_video_adapter_type() const override;
 	virtual String get_video_adapter_api_version() const override;
 
 	virtual Size2i get_maximum_viewport_size() const override;
@@ -122,5 +121,3 @@ public:
 };
 
 } // namespace RendererRD
-
-#endif // UTILITIES_RD_H

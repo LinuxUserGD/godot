@@ -28,20 +28,15 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef SCENE_DEBUGGER_H
-#define SCENE_DEBUGGER_H
+#pragma once
 
-#include "core/input/shortcut.h"
 #include "core/object/ref_counted.h"
 #include "core/string/ustring.h"
-#include "core/templates/pair.h"
-#include "core/variant/array.h"
-#include "scene/gui/view_panner.h"
-#include "scene/resources/mesh.h"
 
-class PopupMenu;
-class Script;
+class Array;
+class InputEvent;
 class Node;
+class Shortcut;
 
 class SceneDebugger {
 private:
@@ -58,12 +53,67 @@ public:
 #ifdef DEBUG_ENABLED
 private:
 	static void _handle_input(const Ref<InputEvent> &p_event, const Ref<Shortcut> &p_shortcut);
+	static void _handle_embed_input(const Ref<InputEvent> &p_event, const Dictionary &p_settings);
 
 	static void _save_node(ObjectID id, const String &p_path);
 	static void _set_node_owner_recursive(Node *p_node, Node *p_owner);
-	static void _set_object_property(ObjectID p_id, const String &p_property, const Variant &p_value);
-	static void _send_object_id(ObjectID p_id, int p_max_size = 1 << 20);
+	static void _set_object_property(ObjectID p_id, const String &p_property, const Variant &p_value, const String &p_field = "");
+	static void _send_object_ids(const Vector<ObjectID> &p_ids, bool p_update_selection);
 	static void _next_frame();
+
+	/// Message handler function for parse_message.
+	typedef Error (*ParseMessageFunc)(const Array &p_args);
+	static HashMap<String, ParseMessageFunc> message_handlers;
+	static void _init_message_handlers();
+
+	static Error _msg_setup_scene(const Array &p_args);
+	static Error _msg_setup_embedded_shortcuts(const Array &p_args);
+	static Error _msg_request_scene_tree(const Array &p_args);
+	static Error _msg_save_node(const Array &p_args);
+	static Error _msg_inspect_objects(const Array &p_args);
+#ifndef DISABLE_DEPRECATED
+	static Error _msg_inspect_object(const Array &p_args);
+#endif // DISABLE_DEPRECATED
+	static Error _msg_clear_selection(const Array &p_args);
+	static Error _msg_suspend_changed(const Array &p_args);
+	static Error _msg_next_frame(const Array &p_args);
+	static Error _msg_speed_changed(const Array &p_args);
+	static Error _msg_debug_mute_audio(const Array &p_args);
+	static Error _msg_override_cameras(const Array &p_args);
+	static Error _msg_set_object_property(const Array &p_args);
+	static Error _msg_set_object_property_field(const Array &p_args);
+	static Error _msg_reload_cached_files(const Array &p_args);
+	static Error _msg_live_set_root(const Array &p_args);
+	static Error _msg_live_node_path(const Array &p_args);
+	static Error _msg_live_res_path(const Array &p_args);
+	static Error _msg_live_node_prop_res(const Array &p_args);
+	static Error _msg_live_node_prop(const Array &p_args);
+	static Error _msg_live_res_prop_res(const Array &p_args);
+	static Error _msg_live_res_prop(const Array &p_args);
+	static Error _msg_live_node_call(const Array &p_args);
+	static Error _msg_live_res_call(const Array &p_args);
+	static Error _msg_live_create_node(const Array &p_args);
+	static Error _msg_live_instantiate_node(const Array &p_args);
+	static Error _msg_live_remove_node(const Array &p_args);
+	static Error _msg_live_remove_and_keep_node(const Array &p_args);
+	static Error _msg_live_restore_node(const Array &p_args);
+	static Error _msg_live_duplicate_node(const Array &p_args);
+	static Error _msg_live_reparent_node(const Array &p_args);
+	static Error _msg_runtime_node_select_setup(const Array &p_args);
+	static Error _msg_runtime_node_select_set_type(const Array &p_args);
+	static Error _msg_runtime_node_select_set_mode(const Array &p_args);
+	static Error _msg_runtime_node_select_set_visible(const Array &p_args);
+	static Error _msg_runtime_node_select_set_avoid_locked(const Array &p_args);
+	static Error _msg_runtime_node_select_set_prefer_group(const Array &p_args);
+	static Error _msg_rq_screenshot(const Array &p_args);
+	static Error _msg_report_window_focused(const Array &p_args);
+
+	static Error _msg_runtime_node_select_reset_camera_2d(const Array &p_args);
+	static Error _msg_transform_camera_2d(const Array &p_args);
+#ifndef _3D_DISABLED
+	static Error _msg_runtime_node_select_reset_camera_3d(const Array &p_args);
+	static Error _msg_transform_camera_3d(const Array &p_args);
+#endif // _3D_DISABLED
 
 public:
 	static Error parse_message(void *p_user, const String &p_msg, const Array &p_args, bool &r_captured);
@@ -74,60 +124,6 @@ public:
 };
 
 #ifdef DEBUG_ENABLED
-class SceneDebuggerObject {
-private:
-	void _parse_script_properties(Script *p_script, ScriptInstance *p_instance);
-
-public:
-	typedef Pair<PropertyInfo, Variant> SceneDebuggerProperty;
-	ObjectID id;
-	String class_name;
-	List<SceneDebuggerProperty> properties;
-
-	SceneDebuggerObject(ObjectID p_id);
-	SceneDebuggerObject() {}
-
-	void serialize(Array &r_arr, int p_max_size = 1 << 20);
-	void deserialize(const Array &p_arr);
-};
-
-class SceneDebuggerTree {
-public:
-	struct RemoteNode {
-		int child_count = 0;
-		String name;
-		String type_name;
-		ObjectID id;
-		String scene_file_path;
-		uint8_t view_flags = 0;
-
-		enum ViewFlags {
-			VIEW_HAS_VISIBLE_METHOD = 1 << 1,
-			VIEW_VISIBLE = 1 << 2,
-			VIEW_VISIBLE_IN_TREE = 1 << 3,
-		};
-
-		RemoteNode(int p_child, const String &p_name, const String &p_type, ObjectID p_id, const String p_scene_file_path, int p_view_flags) {
-			child_count = p_child;
-			name = p_name;
-			type_name = p_type;
-			id = p_id;
-
-			scene_file_path = p_scene_file_path;
-			view_flags = p_view_flags;
-		}
-
-		RemoteNode() {}
-	};
-
-	List<RemoteNode> nodes;
-
-	void serialize(Array &r_arr);
-	void deserialize(const Array &p_arr);
-	SceneDebuggerTree(Node *p_root);
-	SceneDebuggerTree() {}
-};
-
 class LiveEditor {
 private:
 	friend class SceneDebugger;
@@ -171,162 +167,4 @@ private:
 public:
 	static LiveEditor *get_singleton();
 };
-
-class RuntimeNodeSelect : public Object {
-	GDCLASS(RuntimeNodeSelect, Object);
-
-public:
-	enum NodeType {
-		NODE_TYPE_NONE,
-		NODE_TYPE_2D,
-		NODE_TYPE_3D,
-		NODE_TYPE_MAX
-	};
-
-	enum SelectMode {
-		SELECT_MODE_SINGLE,
-		SELECT_MODE_LIST,
-		SELECT_MODE_MAX
-	};
-
-private:
-	friend class SceneDebugger;
-
-	struct SelectResult {
-		Node *item = nullptr;
-		real_t order = 0;
-		_FORCE_INLINE_ bool operator<(const SelectResult &p_rr) const { return p_rr.order < order; }
-	};
-
-	bool has_selection = false;
-	Node *selected_node = nullptr;
-	PopupMenu *selection_list = nullptr;
-	bool selection_visible = true;
-	bool selection_update_queued = false;
-	bool warped_panning = false;
-
-	bool camera_override = false;
-
-	// Values taken from EditorZoomWidget.
-	const float VIEW_2D_MIN_ZOOM = 1.0 / 128;
-	const float VIEW_2D_MAX_ZOOM = 128;
-
-	Ref<ViewPanner> panner;
-	Vector2 view_2d_offset;
-	real_t view_2d_zoom = 1.0;
-
-	RID sbox_2d_canvas;
-	RID sbox_2d_ci;
-	Transform2D sbox_2d_xform;
-	Rect2 sbox_2d_rect;
-
-#ifndef _3D_DISABLED
-	struct Cursor {
-		Vector3 pos;
-		real_t x_rot, y_rot, distance, fov_scale;
-		Vector3 eye_pos; // Used in freelook mode.
-
-		Cursor() {
-			// These rotations place the camera in +X +Y +Z, aka south east, facing north west.
-			x_rot = 0.5;
-			y_rot = -0.5;
-			distance = 4;
-			fov_scale = 1.0;
-		}
-	};
-	Cursor cursor;
-
-	// Values taken from Node3DEditor.
-	const float VIEW_3D_MIN_ZOOM = 0.01;
-#ifdef REAL_T_IS_DOUBLE
-	const double VIEW_3D_MAX_ZOOM = 1'000'000'000'000;
-#else
-	const float VIEW_3D_MAX_ZOOM = 10'000;
-#endif
-	const float CAMERA_ZNEAR = 0.05;
-	const float CAMERA_ZFAR = 4'000;
-
-	const float CAMERA_BASE_FOV = 75;
-	const float CAMERA_MIN_FOV_SCALE = 0.1;
-	const float CAMERA_MAX_FOV_SCALE = 2.5;
-
-	const float FREELOOK_BASE_SPEED = 4;
-	const float RADS_PER_PIXEL = 0.004;
-
-	bool camera_first_override = true;
-	bool camera_freelook = false;
-	real_t freelook_speed = FREELOOK_BASE_SPEED;
-
-	Vector2 previous_mouse_position;
-
-	Ref<ArrayMesh> sbox_3d_mesh;
-	Ref<ArrayMesh> sbox_3d_mesh_xray;
-	RID sbox_3d_instance;
-	RID sbox_3d_instance_ofs;
-	RID sbox_3d_instance_xray;
-	RID sbox_3d_instance_xray_ofs;
-	Transform3D sbox_3d_xform;
-	AABB sbox_3d_bounds;
-#endif
-
-	Point2 selection_position = Point2(INFINITY, INFINITY);
-	bool list_shortcut_pressed = false;
-
-	NodeType node_select_type = NODE_TYPE_2D;
-	SelectMode node_select_mode = SELECT_MODE_SINGLE;
-
-	void _setup(const Dictionary &p_settings);
-
-	void _node_set_type(NodeType p_type);
-	void _select_set_mode(SelectMode p_mode);
-
-	void _set_camera_override_enabled(bool p_enabled);
-
-	void _root_window_input(const Ref<InputEvent> &p_event);
-	void _items_popup_index_pressed(int p_index, PopupMenu *p_popup);
-	void _update_input_state();
-
-	void _process_frame();
-	void _physics_frame();
-
-	void _click_point();
-	void _select_node(Node *p_node);
-	void _queue_selection_update();
-	void _update_selection();
-	void _clear_selection();
-	void _set_selection_visible(bool p_visible);
-
-	void _open_selection_list(const Vector<SelectResult> &p_items, const Point2 &p_pos);
-	void _close_selection_list();
-
-	void _find_canvas_items_at_pos(const Point2 &p_pos, Node *p_node, Vector<SelectResult> &r_items, const Transform2D &p_parent_xform = Transform2D(), const Transform2D &p_canvas_xform = Transform2D());
-	void _pan_callback(Vector2 p_scroll_vec, Ref<InputEvent> p_event);
-	void _zoom_callback(float p_zoom_factor, Vector2 p_origin, Ref<InputEvent> p_event);
-	void _reset_camera_2d();
-	void _update_view_2d();
-
-#ifndef _3D_DISABLED
-	void _find_3d_items_at_pos(const Point2 &p_pos, Vector<SelectResult> &r_items);
-	bool _handle_3d_input(const Ref<InputEvent> &p_event);
-	void _set_camera_freelook_enabled(bool p_enabled);
-	void _cursor_scale_distance(real_t p_scale);
-	void _scale_freelook_speed(real_t p_scale);
-	void _cursor_look(Ref<InputEventWithModifiers> p_event);
-	void _cursor_pan(Ref<InputEventWithModifiers> p_event);
-	void _cursor_orbit(Ref<InputEventWithModifiers> p_event);
-	Transform3D _get_cursor_transform();
-	void _reset_camera_3d();
-#endif
-
-	RuntimeNodeSelect() { singleton = this; }
-
-	inline static RuntimeNodeSelect *singleton = nullptr;
-
-public:
-	static RuntimeNodeSelect *get_singleton();
-
-	~RuntimeNodeSelect();
-};
-#endif
-
-#endif // SCENE_DEBUGGER_H
+#endif // DEBUG_ENABLED

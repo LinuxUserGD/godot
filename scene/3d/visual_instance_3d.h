@@ -28,10 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef VISUAL_INSTANCE_3D_H
-#define VISUAL_INSTANCE_3D_H
+#pragma once
 
 #include "scene/3d/node_3d.h"
+#include "servers/rendering/rendering_server_enums.h"
+
+class Material;
+class TriangleMesh;
 
 class VisualInstance3D : public Node3D {
 	GDCLASS(VisualInstance3D, Node3D);
@@ -45,15 +48,16 @@ class VisualInstance3D : public Node3D {
 protected:
 	void _update_visibility();
 
-	virtual void _physics_interpolated_changed() override;
 	void set_instance_use_identity_transform(bool p_enable);
+	virtual void fti_update_servers_xform() override;
 
 	void _notification(int p_what);
 	static void _bind_methods();
-	void _validate_property(PropertyInfo &p_property) const;
 
 	GDVIRTUAL0RC(AABB, _get_aabb)
 public:
+	static constexpr AncestralClass static_ancestral_class = AncestralClass::VISUAL_INSTANCE_3D;
+
 	enum GetFacesFlags {
 		FACES_SOLID = 1, // solid geometry
 		FACES_ENCLOSING = 2,
@@ -87,11 +91,13 @@ class GeometryInstance3D : public VisualInstance3D {
 	GDCLASS(GeometryInstance3D, VisualInstance3D);
 
 public:
+	static constexpr AncestralClass static_ancestral_class = AncestralClass::GEOMETRY_INSTANCE_3D;
+
 	enum ShadowCastingSetting {
-		SHADOW_CASTING_SETTING_OFF = RS::SHADOW_CASTING_SETTING_OFF,
-		SHADOW_CASTING_SETTING_ON = RS::SHADOW_CASTING_SETTING_ON,
-		SHADOW_CASTING_SETTING_DOUBLE_SIDED = RS::SHADOW_CASTING_SETTING_DOUBLE_SIDED,
-		SHADOW_CASTING_SETTING_SHADOWS_ONLY = RS::SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		SHADOW_CASTING_SETTING_OFF = RSE::SHADOW_CASTING_SETTING_OFF,
+		SHADOW_CASTING_SETTING_ON = RSE::SHADOW_CASTING_SETTING_ON,
+		SHADOW_CASTING_SETTING_DOUBLE_SIDED = RSE::SHADOW_CASTING_SETTING_DOUBLE_SIDED,
+		SHADOW_CASTING_SETTING_SHADOWS_ONLY = RSE::SHADOW_CASTING_SETTING_SHADOWS_ONLY,
 	};
 
 	enum GIMode {
@@ -109,9 +115,9 @@ public:
 	};
 
 	enum VisibilityRangeFadeMode {
-		VISIBILITY_RANGE_FADE_DISABLED = RS::VISIBILITY_RANGE_FADE_DISABLED,
-		VISIBILITY_RANGE_FADE_SELF = RS::VISIBILITY_RANGE_FADE_SELF,
-		VISIBILITY_RANGE_FADE_DEPENDENCIES = RS::VISIBILITY_RANGE_FADE_DEPENDENCIES,
+		VISIBILITY_RANGE_FADE_DISABLED = RSE::VISIBILITY_RANGE_FADE_DISABLED,
+		VISIBILITY_RANGE_FADE_SELF = RSE::VISIBILITY_RANGE_FADE_SELF,
+		VISIBILITY_RANGE_FADE_DEPENDENCIES = RSE::VISIBILITY_RANGE_FADE_DEPENDENCIES,
 	};
 
 private:
@@ -213,5 +219,3 @@ VARIANT_ENUM_CAST(GeometryInstance3D::ShadowCastingSetting);
 VARIANT_ENUM_CAST(GeometryInstance3D::GIMode);
 VARIANT_ENUM_CAST(GeometryInstance3D::LightmapScale);
 VARIANT_ENUM_CAST(GeometryInstance3D::VisibilityRangeFadeMode);
-
-#endif // VISUAL_INSTANCE_3D_H

@@ -28,10 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JAVASCRIPT_BRIDGE_SINGLETON_H
-#define JAVASCRIPT_BRIDGE_SINGLETON_H
+#pragma once
 
-#include "core/object/class_db.h"
 #include "core/object/ref_counted.h"
 
 class JavaScriptObject : public RefCounted {
@@ -69,5 +67,3 @@ public:
 	JavaScriptBridge();
 	~JavaScriptBridge();
 };
-
-#endif // JAVASCRIPT_BRIDGE_SINGLETON_H
