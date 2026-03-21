@@ -8,15 +8,21 @@ import platform_linuxbsd_builders
 common_linuxbsd = [
     "crash_handler_linuxbsd.cpp",
     "os_linuxbsd.cpp",
-    "freedesktop_portal_desktop.cpp",
-    "freedesktop_screensaver.cpp",
-    "freedesktop_at_spi_monitor.cpp",
 ]
 
 if env["library_type"] == "executable":
     common_linuxbsd += ["godot_linuxbsd.cpp"]
 else:
     common_linuxbsd += ["libgodot_linuxbsd.cpp"]
+
+if not env.gdscript_build:
+    common_linuxbsd.extend(
+        [
+            "freedesktop_portal_desktop.cpp",
+            "freedesktop_screensaver.cpp",
+            "freedesktop_at_spi_monitor.cpp",
+        ]
+    )
 
 if env["use_sowrap"]:
     common_linuxbsd.append("xkbcommon-so_wrap.c")

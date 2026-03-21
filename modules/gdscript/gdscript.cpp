@@ -34,12 +34,13 @@
 #include "gdscript_cache.h"
 #include "gdscript_compiler.h"
 #include "gdscript_parser.h"
-#include "gdscript_rpc_callable.h"
 #include "gdscript_tokenizer_buffer.h"
 #include "gdscript_warning.h"
 
+#ifndef GDSCRIPT_BUILD
 #include "core/object/callable_mp.h"
 #include "core/object/class_db.h"
+#endif
 
 #ifdef TOOLS_ENABLED
 #include "editor/gdscript_docgen.h"
@@ -992,11 +993,15 @@ bool GDScript::_get(const StringName &p_name, Variant &r_ret) const {
 		if (likely(top->valid)) {
 			HashMap<StringName, GDScriptFunction *>::ConstIterator E = top->member_functions.find(p_name);
 			if (E && E->value->is_static()) {
+#ifdef GDSCRIPT_BUILD
+				r_ret = Callable(const_cast<GDScript *>(top), E->key);
+#else
 				if (top->rpc_config.has(p_name)) {
 					r_ret = Callable(memnew(GDScriptRPCCallable(const_cast<GDScript *>(top), E->key)));
 				} else {
 					r_ret = Callable(const_cast<GDScript *>(top), E->key);
 				}
+#endif
 				return true;
 			}
 		}
@@ -1655,11 +1660,16 @@ bool GDScriptInstance::get(const StringName &p_name, Variant &r_ret) const {
 		if (likely(sptr->valid)) {
 			HashMap<StringName, GDScriptFunction *>::ConstIterator E = sptr->member_functions.find(p_name);
 			if (E) {
+#ifdef GDSCRIPT_BUILD
+				r_ret = Callable(owner, E->key);
+#else
 				if (sptr->rpc_config.has(p_name)) {
 					r_ret = Callable(memnew(GDScriptRPCCallable(owner, E->key)));
 				} else {
 					r_ret = Callable(owner, E->key);
 				}
+
+#endif
 				return true;
 			}
 		}
@@ -2427,6 +2437,8 @@ void GDScriptLanguage::reload_all_scripts() {
 #endif // DEBUG_ENABLED
 }
 
+#ifndef GDSCRIPT_BUILD
+
 void GDScriptLanguage::reload_scripts(const Array &p_scripts, bool p_soft_reload) {
 #ifdef DEBUG_ENABLED
 
@@ -2564,6 +2576,7 @@ void GDScriptLanguage::reload_scripts(const Array &p_scripts, bool p_soft_reload
 
 #endif // DEBUG_ENABLED
 }
+#endif
 
 void GDScriptLanguage::reload_tool_script(const Ref<Script> &p_script, bool p_soft_reload) {
 	Array scripts = { p_script };

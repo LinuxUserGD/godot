@@ -953,7 +953,9 @@ bool ResourceLoader::_ensure_load_progress() {
 	if (OS::get_singleton()->is_separate_thread_rendering_enabled()) {
 		return false; // Not needed.
 	}
+#ifndef GDSCRIPT_BUILD
 	RenderingServer::get_singleton()->sync();
+#endif
 	return true;
 }
 

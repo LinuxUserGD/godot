@@ -26,7 +26,7 @@ def can_build():
     return True
 
 
-def get_opts():
+def get_opts(gdscript_build: bool):
     from SCons.Variables import BoolVariable, EnumVariable
 
     # Dependencies folder.
@@ -45,6 +45,7 @@ def get_opts():
         except Exception:  # Give up.
             deps_folder = ""
 
+    if_non_gdscript = not gdscript_build
     return [
         EnumVariable("linker", "Linker program", "default", ["default", "bfd", "gold", "lld", "mold"], ignorecase=2),
         BoolVariable("use_llvm", "Use the LLVM compiler", False),
@@ -56,16 +57,16 @@ def get_opts():
         BoolVariable("use_tsan", "Use LLVM/GCC compiler thread sanitizer (TSAN)", False),
         BoolVariable("use_msan", "Use LLVM compiler memory sanitizer (MSAN)", False),
         BoolVariable("use_sowrap", "Dynamically load system libraries", True),
-        BoolVariable("alsa", "Use ALSA", True),
-        BoolVariable("pulseaudio", "Use PulseAudio", True),
-        BoolVariable("dbus", "Use D-Bus to handle screensaver and portal desktop settings", True),
-        BoolVariable("speechd", "Use Speech Dispatcher for Text-to-Speech support", True),
-        BoolVariable("fontconfig", "Use fontconfig for system fonts support", True),
-        BoolVariable("udev", "Use udev for gamepad connection callbacks", True),
-        BoolVariable("x11", "Enable X11 display", True),
-        BoolVariable("wayland", "Enable Wayland display", True),
-        BoolVariable("libdecor", "Enable libdecor support", True),
-        BoolVariable("touch", "Enable touch events", True),
+        BoolVariable("alsa", "Use ALSA", if_non_gdscript),
+        BoolVariable("pulseaudio", "Use PulseAudio", if_non_gdscript),
+        BoolVariable("dbus", "Use D-Bus to handle screensaver and portal desktop settings", if_non_gdscript),
+        BoolVariable("speechd", "Use Speech Dispatcher for Text-to-Speech support", if_non_gdscript),
+        BoolVariable("fontconfig", "Use fontconfig for system fonts support", if_non_gdscript),
+        BoolVariable("udev", "Use udev for gamepad connection callbacks", if_non_gdscript),
+        BoolVariable("x11", "Enable X11 display", if_non_gdscript),
+        BoolVariable("wayland", "Enable Wayland display", if_non_gdscript),
+        BoolVariable("libdecor", "Enable libdecor support", if_non_gdscript),
+        BoolVariable("touch", "Enable touch events", if_non_gdscript),
         BoolVariable("execinfo", "Use libexecinfo on systems where glibc is not available", False),
         # Screen reader support.
         (
@@ -339,7 +340,7 @@ def configure(env: "SConsEnvironment"):
         # No pkgconfig file so far, hardcode expected lib name.
         env.Append(LIBS=["embree4"])
 
-    if not env["builtin_openxr"]:
+    if env["openxr"] and not env["builtin_openxr"]:
         env.ParseConfig("pkg-config openxr --cflags --libs")
 
     if env["fontconfig"]:

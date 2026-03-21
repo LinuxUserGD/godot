@@ -85,12 +85,14 @@ double Engine::get_physics_jitter_fix() const {
 }
 
 void Engine::set_max_fps(int p_fps) {
+#ifndef GDSCRIPT_BUILD
 	_max_fps = p_fps > 0 ? p_fps : 0;
 
 	RenderingDevice *rd = RenderingDevice::get_singleton();
 	if (rd) {
 		rd->_set_max_fps(_max_fps);
 	}
+#endif
 }
 
 int Engine::get_max_fps() const {

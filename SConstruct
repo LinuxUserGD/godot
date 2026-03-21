@@ -61,9 +61,13 @@ import scu_builders
 from misc.utility.color import is_stderr_color, print_error, print_info, print_warning
 from platform_methods import architecture_aliases, architectures, compatibility_platform_aliases
 
+gdscript_build = False
 if ARGUMENTS.get("target", "editor") == "editor":
     _helper_module("editor.editor_builders", "editor/editor_builders.py")
     _helper_module("editor.template_builders", "editor/template_builders.py")
+elif ARGUMENTS.get("target") == "gdscript":
+    # Check early so we can disable platform specific modules like rendering and audio
+    gdscript_build = True
 
 # Scan possible build platforms
 
@@ -101,7 +105,7 @@ for x in sorted(glob.glob("platform/*")):
         x = x.replace("platform/", "")  # rest of world
         x = x.replace("platform\\", "")  # win32
         platform_list += [x]
-        platform_opts[x] = detect.get_opts()
+        platform_opts[x] = detect.get_opts(gdscript_build)
         platform_flags[x] = detect.get_flags()
         if isinstance(platform_flags[x], list):  # backwards compatibility
             platform_flags[x] = {flag[0]: flag[1] for flag in platform_flags[x]}
@@ -175,6 +179,10 @@ opts.Add(
         ignorecase=2,
     )
 )
+opts.Update(env)
+env.gdscript_build = env["target"] == "gdscript"
+if_non_gdscript = not env.gdscript_build
+
 opts.Add(BoolVariable("debug_symbols", "Build with debugging symbols", False))
 opts.Add(BoolVariable("separate_debug_symbols", "Extract debugging symbols to a separate file", False))
 opts.Add(BoolVariable("debug_paths_relative", "Make file paths in debug symbols relative (if supported)", False))
@@ -465,7 +473,7 @@ for name, path in modules_detected.items():
     sys.path.insert(0, path)
     import config
 
-    if env["modules_enabled_by_default"]:
+    if env["modules_enabled_by_default"] or (env.gdscript_build and name == "gdscript"):
         enabled = True
         try:
             enabled = config.is_enabled()
@@ -524,7 +532,7 @@ env.platform_apis = platform_apis
 
 env.editor_build = env["target"] == "editor"
 env.dev_build = env["dev_build"]
-env.debug_features = env["target"] in ["editor", "template_debug"]
+env.debug_features = env["target"] in ["editor", "template_debug", "gdscript"]
 
 if env["optimize"] == "auto":
     if env.dev_build:
@@ -539,6 +547,9 @@ env["debug_symbols"] = methods.get_cmdline_bool("debug_symbols", env.dev_build)
 
 if env.editor_build:
     env.Append(CPPDEFINES=["TOOLS_ENABLED"])
+
+if env.gdscript_build:
+    env.Append(CPPDEFINES=["GDSCRIPT_BUILD"])
 
 if env.debug_features:
     # DEBUG_ENABLED enables debugging *features* and debug-only code, which is intended
@@ -1209,8 +1220,9 @@ if "cpp_compiler_launcher" in env:
 Export("env")
 
 SConscript("core/SCsub")
-SConscript("servers/SCsub")
-SConscript("scene/SCsub")
+if not env.gdscript_build:
+    SConscript("servers/SCsub")
+    SConscript("scene/SCsub")
 if env.editor_build:
     SConscript("editor/SCsub")
 SConscript("drivers/SCsub")
@@ -1219,7 +1231,11 @@ SConscript("platform/SCsub")
 SConscript("modules/SCsub")
 if env["tests"]:
     SConscript("tests/SCsub")
-SConscript("main/SCsub")
+
+if env.gdscript_build:
+    SConscript("modules/gdscript/main/SCsub")
+else:
+    SConscript("main/SCsub")
 
 SConscript("platform/" + env["platform"] + "/SCsub")  # Build selected platform.
 

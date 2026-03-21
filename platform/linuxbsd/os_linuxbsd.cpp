@@ -340,6 +340,7 @@ String OS_LinuxBSD::get_version() const {
 	return release_version;
 }
 
+#ifndef GDSCRIPT_BUILD
 Vector<String> OS_LinuxBSD::get_video_adapter_driver_info() const {
 	if (RenderingServer::get_singleton() == nullptr) {
 		return Vector<String>();
@@ -462,6 +463,7 @@ Vector<String> OS_LinuxBSD::get_video_adapter_driver_info() const {
 
 	return info;
 }
+#endif // GDSCRIPT_BUILD
 
 Vector<String> OS_LinuxBSD::lspci_device_filter(Vector<String> vendor_device_id_mapping, String class_suffix, String check_column, String whitelist) const {
 	// NOTE: whitelist can be changed to `Vector<String>`, if the need arises.
@@ -997,7 +999,9 @@ void OS_LinuxBSD::run() {
 	while (true) {
 		GodotProfileFrameMark;
 		GodotProfileZone("OS_LinuxBSD::run");
+#ifndef GDSCRIPT_BUILD
 		DisplayServer::get_singleton()->process_events(); // get rid of pending events
+#endif
 #ifdef SDL_ENABLED
 		if (joypad_sdl) {
 			joypad_sdl->process_events();

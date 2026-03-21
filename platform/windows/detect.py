@@ -161,7 +161,7 @@ def get_tools(env: "SConsEnvironment"):
         return ["msvc", "mslink", "mslib"]
 
 
-def get_opts():
+def get_opts(_gdscript_build: bool):
     from SCons.Variables import BoolVariable, EnumVariable
 
     mingw = os.getenv("MINGW_PREFIX", "")

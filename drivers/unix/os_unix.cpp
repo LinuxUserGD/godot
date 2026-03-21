@@ -192,9 +192,11 @@ void OS_Unix::finalize_core() {
 #endif
 }
 
+#ifndef GDSCRIPT_BUILD
 Vector<String> OS_Unix::get_video_adapter_driver_info() const {
 	return Vector<String>();
 }
+#endif
 
 String OS_Unix::get_stdin_string(int64_t p_buffer_size) {
 	Vector<uint8_t> data;

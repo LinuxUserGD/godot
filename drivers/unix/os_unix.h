@@ -85,7 +85,9 @@ protected:
 public:
 	OS_Unix();
 
+#ifndef GDSCRIPT_BUILD
 	virtual Vector<String> get_video_adapter_driver_info() const override;
+#endif
 
 	virtual String get_stdin_string(int64_t p_buffer_size = 1024) override;
 	virtual PackedByteArray get_stdin_buffer(int64_t p_buffer_size = 1024) override;

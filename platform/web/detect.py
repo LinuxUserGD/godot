@@ -35,7 +35,7 @@ def get_tools(env: "SConsEnvironment"):
     return ["cc", "c++", "ar", "link", "textfile", "zip"]
 
 
-def get_opts():
+def get_opts(_gdscript_build: bool):
     from SCons.Variables import BoolVariable
 
     return [
