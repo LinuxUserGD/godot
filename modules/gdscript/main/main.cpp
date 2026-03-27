@@ -30,6 +30,8 @@
 
 #include "main.h"
 
+#include "core/os/os.h"
+#include "core/config/engine.h"
 #include "core/config/project_settings.h"
 #include "core/register_core_types.h"
 #include "modules/gdscript/gdscript.h"

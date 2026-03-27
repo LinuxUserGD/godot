@@ -165,7 +165,7 @@ opts = Variables(customs, ARGUMENTS)
 opts.Add((["platform", "p"], "Target platform (%s)" % "|".join(platform_list), ""))
 opts.Add(
     EnumVariable(
-        "target", "Compilation target", "editor", ["editor", "template_release", "template_debug"], ignorecase=2
+        "target", "Compilation target", "editor", ["editor", "template_release", "template_debug", "gdscript"], ignorecase=2
     )
 )
 opts.Add(EnumVariable("arch", "CPU architecture", "auto", ["auto"] + architectures, architecture_aliases, ignorecase=2))
